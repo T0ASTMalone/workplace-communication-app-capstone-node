@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS users;
+
+DROP TABLE IF EXISTS meal_log;
+
+DROP DATABASE IF EXISTS food_log;

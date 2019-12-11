@@ -1,0 +1,5 @@
+TRUNCATE food_log, meal_log, users RESTART IDENTITY;
+
+ALTER TABLE users ALTER COLUMN height TYPE DECIMAL (6, 2);
+
+ALTER TABLE users ALTER COLUMN weight TYPE DECIMAL (6, 2);

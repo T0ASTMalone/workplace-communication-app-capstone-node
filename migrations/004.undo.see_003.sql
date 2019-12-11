@@ -1,0 +1,1 @@
+ALTER TABLE users ALTER COLUMN activity_lvl TYPE TEXT USING activity_lvl::text;
