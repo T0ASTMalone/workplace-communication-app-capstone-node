@@ -1,1 +1,0 @@
-ALTER TABLE users ALTER COLUMN activity_lvl TYPE DECIMAL(4, 2);
