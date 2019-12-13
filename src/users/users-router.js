@@ -79,4 +79,52 @@ usersRouter
       .catch(next);
   });
 
+usersRouter
+  .route("/:id")
+  .all((req, res, next) => {
+    const knex = req.app.get("db");
+    const id = req.params.id;
+    usersService
+      .getUsrById(knex, id)
+      .then(user => {
+        if (!user) {
+          return res.status(404).json({ error: { message: `User not found` } });
+        }
+        res.user = user;
+        next();
+      })
+      .catch(next);
+  })
+  .get((res, req, next) => {
+    return res.status(200).json(usersService.serializeUser(res.user));
+  })
+  .delete((req, res, next) => {
+    const knex = req.app.get("db");
+    const id = req.params.id;
+    usersService
+      .deleteUsr(knex, id)
+      .then(() => {
+        return res.status(201).end();
+      })
+      .catch(next);
+  })
+  .patch((req, res, next) => {
+    const knex = req.app.get("db");
+    const id = req.params.id;
+    const newUserInfo = req.body;
+    if (!newUserInfo) {
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain a 'user name'`
+        }
+      });
+    }
+    usersServices
+      .updateUser(knex, id, newUserInfo)
+      .then(() => {
+        res.status(204).end();
+      })
+      .catch(next);
+  });
+
 module.exports = usersRouter;

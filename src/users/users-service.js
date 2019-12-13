@@ -1,8 +1,18 @@
 const xss = require("xss");
+const bcrypt = require("bcryptjs");
+
+const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
 const userService = {
   getUsers(db) {
     return db("users").select("*");
+  },
+
+  getUsrById(db, id) {
+    return db("users")
+      .select("*")
+      .where("user_id", id)
+      .first();
   },
 
   usrExists(db, username, wp_id) {
@@ -11,6 +21,25 @@ const userService = {
       .where({ wp_id })
       .first()
       .then(user => !!user);
+  },
+
+  createUser(db, user) {
+    return db("users")
+      .insert(user)
+      .returning("*")
+      .then(rows => rows[0]);
+  },
+
+  deleteUsr(db, id) {
+    return db("users")
+      .where("user_id", id)
+      .delete();
+  },
+
+  updateUser(knex, id, newUser) {
+    return knex("users")
+      .where("user_id", id)
+      .update(newUser);
   },
 
   validatePassword(password) {
@@ -27,6 +56,10 @@ const userService = {
       return "Password must contain 1 upper case, lower case, number and special character";
     }
     return null;
+  },
+
+  hashPass(password) {
+    return bcrypt.hash(password, 12);
   },
 
   serializeUser(user) {
