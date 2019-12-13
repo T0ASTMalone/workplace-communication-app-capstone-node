@@ -19,7 +19,6 @@ usersRouter
   .post(jsonParser, (req, res, next) => {
     const knex = req.app.get("db");
     const {
-      user_id,
       username,
       password,
       wp_id,
@@ -29,7 +28,6 @@ usersRouter
       img
     } = req.body;
     const user = {
-      user_id,
       username,
       password,
       wp_id,
@@ -45,11 +43,13 @@ usersRouter
         .json({ error: { message: `Missing user in request body` } });
     }
 
-    for (const [key, value] of Object.entries(userInfo)) {
+    for (const [key, value] of Object.entries(user)) {
       if (value == null) {
-        return res.status(400).json({
-          error: `Missing '${key}' in request body`
-        });
+        if (key !== "nickname" && key !== "img") {
+          return res.status(400).json({
+            error: `Missing '${key}' in request body`
+          });
+        }
       }
     }
 
@@ -72,7 +72,7 @@ usersRouter
             res
               .status(201)
               .location(path.posix.join(req.originalUrl + `/${user.user_id}`))
-              .json(usersServices.serializeUser(user));
+              .json(usersService.serializeUser(user));
           });
         });
       })
