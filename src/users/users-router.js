@@ -18,61 +18,64 @@ usersRouter
   })
   .post(jsonParser, (req, res, next) => {
     const knex = req.app.get("db");
-    const {
-      username,
-      password,
-      wp_id,
-      wp_name,
-      type,
-      nickname,
-      img
-    } = req.body;
-    const user = {
-      username,
-      password,
-      wp_id,
-      wp_name,
-      type,
-      nickname,
-      img
-    };
-
-    if (!user) {
-      return res
-        .status(400)
-        .json({ error: { message: `Missing user in request body` } });
-    }
-
-    for (const [key, value] of Object.entries(user)) {
-      if (value == null) {
-        if (key !== "nickname" && key !== "img") {
-          return res.status(400).json({
-            error: `Missing '${key}' in request body`
-          });
-        }
-      }
-    }
-
-    const passErr = usersService.validatePassword(password);
-    if (passErr) {
-      return res.status(400).json({ error: { message: passErr } });
-    }
+    const { username, password, code, type, nickname, img } = req.body;
 
     usersService
-      .usrExists(knex, username, wp_id)
-      .then(existing => {
-        if (existing) {
+      .getWp(knex, code)
+      .then(wp => {
+        if (!wp) {
+          return res
+            .status(404)
+            .json({ error: { message: `Invalid WorkPlace Code` } });
+        }
+
+        let wp_id = wp.wp_id;
+        let wp_name = wp.wp_name;
+        const user = {
+          username,
+          password,
+          wp_id,
+          wp_name,
+          type,
+          nickname,
+          img
+        };
+
+        if (!user) {
           return res
             .status(400)
-            .json({ error: { message: "User already exists" } });
+            .json({ error: { message: `Missing user in request body` } });
         }
-        return usersService.hashPass(password).then(hashedPass => {
-          user.password = hashedPass;
-          return usersService.createUser(knex, user).then(user => {
-            res
-              .status(201)
-              .location(path.posix.join(req.originalUrl + `/${user.user_id}`))
-              .json(usersService.serializeUser(user));
+
+        for (const [key, value] of Object.entries(user)) {
+          if (value == null) {
+            if (key !== "nickname" && key !== "img") {
+              return res.status(400).json({
+                error: `Missing '${key}' in request body`
+              });
+            }
+          }
+        }
+
+        const passErr = usersService.validatePassword(password);
+        if (passErr) {
+          return res.status(400).json({ error: { message: passErr } });
+        }
+
+        usersService.usrExists(knex, username, wp_id).then(existing => {
+          if (existing) {
+            return res
+              .status(400)
+              .json({ error: { message: "User already exists" } });
+          }
+          return usersService.hashPass(password).then(hashedPass => {
+            user.password = hashedPass;
+            return usersService.createUser(knex, user).then(user => {
+              res
+                .status(201)
+                .location(path.posix.join(req.originalUrl + `/${user.user_id}`))
+                .json(usersService.serializeUser(user));
+            });
           });
         });
       })

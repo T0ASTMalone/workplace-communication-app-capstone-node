@@ -29,6 +29,13 @@ const userService = {
       .then(user => !!user);
   },
 
+  getWp(db, wp_code) {
+    return db("workplaces")
+      .select("*")
+      .where({ wp_code })
+      .first();
+  },
+
   createUser(db, user) {
     return db("users")
       .insert(user)
