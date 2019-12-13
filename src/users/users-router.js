@@ -10,7 +10,7 @@ usersRouter
   .get((req, res, next) => {
     const knex = req.app.get("db");
     usersService
-      .getUsers(knex)
+      .getAllUsers(knex)
       .then(users => {
         res.json(users.map(user => usersService.serializeUser(user)));
       })
@@ -126,5 +126,23 @@ usersRouter
       })
       .catch(next);
   });
+
+usersRouter.route("/wp/:wpId").all((req, res, next) => {
+  const knex = req.app.get("db");
+  const id = req.params.wpId;
+  usersService
+    .getWpUsers(knex, id)
+    .then(users => {
+      if (!users) {
+        return res
+          .status(404)
+          .json({ error: { message: `There are no users in this WorkPlace` } });
+      }
+      return res
+        .status(200)
+        .json(users.map(user => usersService.serializeUser(user)));
+    })
+    .catch(next);
+});
 
 module.exports = usersRouter;
