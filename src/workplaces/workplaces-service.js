@@ -12,6 +12,13 @@ const wpService = {
       .then(rows => rows[0]);
   },
 
+  getById(db, wp_id) {
+    return db("workplaces")
+      .select("*")
+      .where({ wp_id })
+      .first();
+  },
+
   serializeWp(wp) {
     return {
       id: wp.wp_id,

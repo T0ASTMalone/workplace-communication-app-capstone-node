@@ -19,12 +19,14 @@ usersRouter
   })
   .post(jsonParser, (req, res, next) => {
     const knex = req.app.get("db");
-    const { username, password, code, nickname, img } = req.body;
+    const { username, password, code, type, nickname, img } = req.body;
     // find WorkPlace with code provided
     // create user object that includes the wpId and wpName
     const user = {
       username,
+      type,
       password,
+      code,
       nickname,
       img
     };
@@ -33,6 +35,24 @@ usersRouter
       return res
         .status(400)
         .json({ error: { message: `Missing user in request body` } });
+    }
+
+    // check for missing fields
+    for (const [key, value] of Object.entries(user)) {
+      if (value == null) {
+        if (key !== "nickname" && key !== "img") {
+          return res.status(400).json({
+            error: `Missing '${key}' in request body`
+          });
+        }
+      }
+    }
+
+    // validate password
+    const passErr = usersService.validatePassword(password);
+
+    if (passErr) {
+      return res.status(400).json({ error: { message: passErr } });
     }
 
     usersService
@@ -46,25 +66,14 @@ usersRouter
             .json({ error: { message: `Invalid WorkPlace Code` } });
         }
         // else get wpId and wpName if WorkPlace
-        user.type = "pending";
+        if (type !== "creator" || type !== "user") {
+          user.type = "pending";
+        }
         user.wp_id = wp.wp_id;
         user.wp_name = wp.wp_name;
 
-        // check for missing fields
-        for (const [key, value] of Object.entries(user)) {
-          if (value == null) {
-            if (key !== "nickname" && key !== "img") {
-              return res.status(400).json({
-                error: `Missing '${key}' in request body`
-              });
-            }
-          }
-        }
-        // validate password
-        const passErr = usersService.validatePassword(password);
-        if (passErr) {
-          return res.status(400).json({ error: { message: passErr } });
-        }
+        delete user.code;
+
         // validate that users with that username does not already exists
         // in the WorkPlace
         usersService.usrExists(knex, username, user.wp_id).then(existing => {
@@ -73,7 +82,7 @@ usersRouter
           if (existing) {
             return res
               .status(400)
-              .json({ error: { message: "User already exists" } });
+              .json({ error: { message: "Username already taken" } });
           }
           // hash the users password
           return usersService.hashPass(password).then(hashedPass => {

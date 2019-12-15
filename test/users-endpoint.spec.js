@@ -53,9 +53,9 @@ describe("users router", () => {
 
   describe(`Post /api/users`, () => {
     context(`User Validation`, () => {
-      beforeEach("insert wp", () => {
-        helpers.seedWp(db, testWp);
-      });
+      // beforeEach("insert wp", () => {
+      //   helpers.seedWp(db, testWp);
+      // });
 
       const requiredFields = [
         "username",
@@ -71,21 +71,175 @@ describe("users router", () => {
         const registerAttemptBody = {
           username: "testuser",
           password: "Thisis@testpassword!",
+          type: "pending",
           code: 1234,
-          type: "user",
           nickname: null,
           img: null
         };
         it(`responds with 400 required error when '${field}' is missing`, () => {
           delete registerAttemptBody[field];
-
-          return supertest(app)
-            .post("/api/users")
-            .send(registerAttemptBody)
-            .expect(400, {
-              error: `Missing '${field}' in request body`
-            });
+          if (field !== "nickname" && field !== "img") {
+            return supertest(app)
+              .post("/api/users")
+              .send(registerAttemptBody)
+              .expect(400, {
+                error: `Missing '${field}' in request body`
+              });
+          }
         });
+      });
+
+      it("responds 400 password must be longers than 8 characters when empty password", () => {
+        const shortPass = {
+          username: "Test user",
+          password: "112",
+          type: "",
+          code: 1234,
+          nickname: null,
+          img: null
+        };
+
+        return supertest(app)
+          .post("/api/users")
+          .send(shortPass)
+          .expect(400, {
+            error: { message: `Password be longer than 8 characters` }
+          });
+      });
+
+      it(`responds 400 'Password be less than 72 characters' when long password`, () => {
+        const userLongPassword = {
+          username: "testusername",
+          password: "*".repeat(73),
+          type: "",
+          code: 1234,
+          nickname: null,
+          img: null
+        };
+        return supertest(app)
+          .post("/api/users")
+          .send(userLongPassword)
+          .expect(400, {
+            error: { message: `Password be less than 72 characters` }
+          });
+      });
+
+      it(`responds 400 error when password starts with spaces`, () => {
+        const userPasswordStartsSpaces = {
+          username: "Test user",
+          password: " 1Aa!2Bb@",
+          type: "",
+          code: 1234,
+          nickname: null,
+          img: null
+        };
+        return supertest(app)
+          .post("/api/users")
+          .send(userPasswordStartsSpaces)
+          .expect(400, {
+            error: {
+              message: `Password must not start or end with empty spaces`
+            }
+          });
+      });
+
+      it(`responds 400 error when password ends with spaces`, () => {
+        const userPasswordEndsSpaces = {
+          username: "testemail@testmail",
+          password: "1Aa!2Bb@ ",
+          type: "",
+          code: 1234,
+          nickname: null,
+          img: null
+        };
+        return supertest(app)
+          .post("/api/users")
+          .send(userPasswordEndsSpaces)
+          .expect(400, {
+            error: {
+              message: `Password must not start or end with empty spaces`
+            }
+          });
+      });
+
+      it(`responds 400 error when password isn't complex enough`, () => {
+        const userPasswordNotComplex = {
+          username: "testemail@testmail",
+          password: "11AAaabb",
+          type: "",
+          code: 1234,
+          nickname: null,
+          img: null
+        };
+        return supertest(app)
+          .post("/api/users")
+          .send(userPasswordNotComplex)
+          .expect(400, {
+            error: {
+              message: `Password must contain 1 upper case, lower case, number and special character`
+            }
+          });
+      });
+
+      it(`responds 400 'Username already taken' when username isn't unique`, async () => {
+        await helpers.seedWp(db, testWp);
+        await helpers.seedUsers(db, testUsers);
+        const duplicateUser = {
+          username: testUser.username,
+          password: "TestPassw0rd!",
+          type: "",
+          code: 1234,
+          nickname: null,
+          img: null
+        };
+        return supertest(app)
+          .post("/api/users")
+          .send(duplicateUser)
+          .expect(400, { error: { message: `Username already taken` } });
+      });
+    });
+
+    context(`Happy path`, () => {
+      it(`responds 201, serialized user, storing bcryped password`, async () => {
+        await helpers.seedWp(db, testWp);
+        const newUser = {
+          username: "testusername",
+          password: "TestPassw0rd!",
+          type: "",
+          code: 1234,
+          nickname: null,
+          img: null
+        };
+
+        return supertest(app)
+          .post("/api/users")
+          .send(newUser)
+          .expect(201)
+          .expect(res => {
+            expect(res.body).to.have.property("user_id");
+            expect(res.body.username).to.eql(newUser.username);
+            expect(res.body.nickname).to.be.oneOf([newUser.nickname, ""]);
+            expect(res.body.img).to.eql(newUser.img);
+            expect(res.body.type).to.be.oneOf(["pending", "creator", "user"]);
+            expect(res.body).to.not.have.property("password");
+            expect(res.headers.location).to.eql(
+              `/api/users/${res.body.user_id}`
+            );
+          })
+          .expect(res =>
+            db
+              .from("users")
+              .select("*")
+              .where("user_id", res.body.user_id)
+              .first()
+              .then(row => {
+                expect(row.username).to.eql(newUser.username);
+                return bcrypt.compare(newUser.password, row.password);
+              })
+              .then(compareMatch => {
+                expect(compareMatch).to.be.true;
+              })
+          );
       });
     });
   });

@@ -49,4 +49,27 @@ wpRouter
       .catch(next);
   });
 
+wpRouter
+  .route("/:id")
+  .all(requireAuth)
+  .all((req, res, next) => {
+    let knex = req.app.get("db");
+    let id = req.params.id;
+    wpService
+      .getById(knex, id)
+      .then(wp => {
+        if (!wp) {
+          return res
+            .status(404)
+            .json({ error: { message: `WorkPlace not found` } });
+        }
+        res.wp = wp;
+        next();
+      })
+      .catch(next);
+  })
+  .get((req, res, next) => {
+    res.json(wpService.serializeWp(res.wp));
+  });
+
 module.exports = wpRouter;
