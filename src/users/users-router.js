@@ -1,7 +1,7 @@
 const path = require("path");
 const express = require("express");
 const usersService = require("./users-service");
-const requireAuth = require("../auth/auth-router");
+const { requireAuth } = require("../middleware/jwt-auth");
 const usersRouter = express.Router();
 
 const jsonParser = express.json();
@@ -79,7 +79,7 @@ usersRouter
           return usersService.hashPass(password).then(hashedPass => {
             user.password = hashedPass;
             // create user
-            return usersService.createUser(knex, user).then(user => {
+            return usersService.createUsr(knex, user).then(user => {
               // respond with new user
               res
                 .status(201)
@@ -94,6 +94,7 @@ usersRouter
 
 usersRouter
   .route("/:id")
+  .all(requireAuth)
   .all((req, res, next) => {
     const knex = req.app.get("db");
     const id = req.params.id;
@@ -108,8 +109,8 @@ usersRouter
       })
       .catch(next);
   })
-  .get((res, req, next) => {
-    return res.status(200).json(usersService.serializeUser(res.user));
+  .get((req, res, next) => {
+    return res.json(usersService.serializeUser(res.user));
   })
   .delete((req, res, next) => {
     const knex = req.app.get("db");
@@ -148,8 +149,12 @@ usersRouter
   .get((req, res, next) => {
     const knex = req.app.get("db");
     const id = req.params.wpId;
+    // accepts query string for user type
+    // creator, user, or pending
+    const type = req.query.type || "all";
+
     usersService
-      .getWpUsers(knex, id)
+      .getWpUsers(knex, id, type)
       .then(users => {
         if (!users) {
           return res.status(404).json({
@@ -162,7 +167,5 @@ usersRouter
       })
       .catch(next);
   });
-
-// wp specific users router for getting pending users
 
 module.exports = usersRouter;

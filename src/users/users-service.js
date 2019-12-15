@@ -8,7 +8,13 @@ const userService = {
     return db("users").select("*");
   },
 
-  getWpUsers(db, wp_id) {
+  getWpUsers(db, wp_id, type) {
+    if (type !== "all") {
+      return db("users")
+        .select("*")
+        .where({ wp_id })
+        .where({ type });
+    }
     return db("users")
       .select("*")
       .where({ wp_id });
@@ -36,7 +42,7 @@ const userService = {
       .first();
   },
 
-  createUser(db, user) {
+  createUsr(db, user) {
     return db("users")
       .insert(user)
       .returning("*")

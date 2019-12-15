@@ -1,5 +1,5 @@
 {
-  "name": "macros-tracker-node",
+  "name": "workplace-node",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -29,6 +29,7 @@
     "morgan": "^1.9.1",
     "pg": "^7.12.1",
     "postgrator": "^3.10.2",
+    "shortid": "^2.2.15",
     "xss": "^1.0.6"
   },
   "devDependencies": {
