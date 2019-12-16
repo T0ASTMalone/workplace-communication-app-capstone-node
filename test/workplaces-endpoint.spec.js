@@ -82,6 +82,23 @@ describe.only("Wp endpoint", () => {
       });
     });
 
+    context("Given an xss attack meal", () => {
+      const { maliciousWp, expectedWp } = helpers.makeMaliciousWp();
+
+      beforeEach("seed malicious meal", () => {
+        helpers.seedWp(db, [maliciousWp]);
+      });
+
+      const testUser = testUsers[0];
+
+      it(`removes xss attack content`, () => {
+        return supertest(app)
+          .get(`/api/wp/${maliciousWp.wp_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(200, expectedWp);
+      });
+    });
+
     context("Happy Path", () => {
       it("responds with 201, serialized wp", () => {
         const newWp = {

@@ -59,6 +59,28 @@ makeWp = () => {
   ];
 };
 
+makeMaliciousWp = () => {
+  const maliciousWp = {
+    wp_id: 1,
+    wp_name: 'Naughty naughty very naughty <script>alert("xss");</script>',
+    type: "company",
+    wp_code: "1234"
+  };
+
+  const expectedWp = {
+    ...maliciousWp,
+    wp_name:
+      'Naughty naughty very naughty &lt;script&gt;alert("xss");&lt;/script&gt;'
+  };
+
+  delete expectedWp.wp_code;
+
+  return {
+    maliciousWp,
+    expectedWp
+  };
+};
+
 cleanTables = db => {
   return db.transaction(trx =>
     trx
@@ -127,5 +149,6 @@ module.exports = {
   cleanTables,
   seedUsers,
   seedWp,
-  makeAuthHeader
+  makeAuthHeader,
+  makeMaliciousWp
 };
