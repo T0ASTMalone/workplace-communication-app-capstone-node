@@ -15,7 +15,7 @@ wpRouter
     wpService
       .getWorkplaces(knex)
       .then(workplaces => {
-        if (!workplaces) {
+        if (workplaces.length < 1) {
           return res
             .status(404)
             .json({ error: { message: `There are not workplaces here` } });
@@ -43,7 +43,7 @@ wpRouter
       .then(newWp => {
         return res
           .status(201)
-          .location(path.posix.join(req.originalUrl + `${newWp.wp_id}`))
+          .location(path.posix.join(req.originalUrl + `/${newWp.wp_id}`))
           .json(wpService.serializeWp(newWp));
       })
       .catch(next);

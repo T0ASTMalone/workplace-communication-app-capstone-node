@@ -53,10 +53,6 @@ describe("users router", () => {
 
   describe(`Post /api/users`, () => {
     context(`User Validation`, () => {
-      // beforeEach("insert wp", () => {
-      //   helpers.seedWp(db, testWp);
-      // });
-
       const requiredFields = [
         "username",
         "password",

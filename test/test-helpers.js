@@ -42,19 +42,19 @@ makeWp = () => {
       wp_name: "TEST COMPANY 1",
       type: "company",
       wp_code: "1234",
-      wp_id: "1"
+      wp_id: 1
     },
     {
       wp_name: "TEST COMPANY 2",
       type: "company",
       wp_code: "1235",
-      wp_id: "2"
+      wp_id: 2
     },
     {
       wp_name: "TEST COMPANY 3",
       type: "company",
       wp_code: "1236",
-      wp_id: "3"
+      wp_id: 3
     }
   ];
 };

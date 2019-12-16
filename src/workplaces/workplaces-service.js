@@ -21,8 +21,8 @@ const wpService = {
 
   serializeWp(wp) {
     return {
-      id: wp.wp_id,
-      name: xss(wp.wp_name),
+      wp_id: wp.wp_id,
+      wp_name: xss(wp.wp_name),
       type: wp.type
     };
   }
