@@ -24,20 +24,44 @@ describe.only("Posts router", () => {
 
   afterEach("cleanup", () => helpers.cleanTables(db));
 
+  beforeEach("Seed wp and users", async () => {
+    await helpers.seedWp(db, testWp);
+    helpers.seedUsers(db, testUsers);
+  });
+
   describe("GET /api/posts/:id", () => {
-    context("Given there are posts in the db", () => {
+    context.only("Given there are posts in the db", () => {
       beforeEach("seed users and wp and posts", () => {
-        helpers.seedWp(db, testWp);
-        helpers.seedUsers(db, testUsers);
         helpers.seedPosts(db, testPosts);
       });
       const testUser = testUsers[0];
-      const expectedPost = testPosts[0];
+
       it("responds with 200 and the post", () => {
+        const expectedPost = testPosts[0];
         return supertest(app)
-          .get(`/api/posts/${testUser.user_id}`)
+          .get(`/api/posts/${expectedPost.post_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(200, expectedPost);
+      });
+
+      it("Responds with 201", () => {
+        return supertest(app)
+          .delete(`/api/posts/${testPosts[0].post_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(204);
+      });
+
+      it("responds with 204 and the post is updated", () => {
+        const newPost = {
+          ...testPosts[0],
+          content: "This is an updated post"
+        };
+
+        return supertest(app)
+          .patch(`/api/posts/${testPosts[0].post_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .send(newPost)
+          .expect(204);
       });
     });
 
@@ -47,6 +71,33 @@ describe.only("Posts router", () => {
           .get(`/api/posts/1`)
           .set("Authorization", "Bearer thisisapassword")
           .expect(401, { error: "Unauthorized request" });
+      });
+    });
+  });
+
+  describe("GET /api/posts", () => {
+    context("given there are no posts", () => {
+      const testUser = testUsers[0];
+      it("responds with 404", () => {
+        return supertest(app)
+          .get("/api/posts")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(200, []);
+      });
+    });
+
+    context("given there are posts in the db", () => {
+      beforeEach("Seed wp and users", () => {
+        helpers.seedPosts(db, testPosts);
+      });
+
+      const testUser = testUsers[0];
+
+      it("responds with 4", () => {
+        return supertest(app)
+          .get("/api/posts")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(200, testPosts);
       });
     });
   });

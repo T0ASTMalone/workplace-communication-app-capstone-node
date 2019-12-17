@@ -14,7 +14,9 @@ postsRouter
     postsService
       .getAllPosts(knex)
       .then(posts => {
-        res.json(posts.map(posts => postsService.serializePost(posts)));
+        return res
+          .status(200)
+          .json(posts.map(posts => postsService.serializePost(posts)));
       })
       .catch(next);
   })
@@ -82,22 +84,23 @@ postsRouter
     postsService
       .deletePost(knex, id)
       .then(() => {
-        return res.status(201).end();
+        return res.status(204).end();
       })
       .catch(next);
   })
-  .patch((req, res, next) => {
+  .patch(jsonParser, (req, res, next) => {
     const knex = req.app.get("db");
     const id = req.params.id;
     const newPostInfo = req.body;
-    if (!newUserInfo) {
+    if (!newPostInfo) {
       return res.status(400).json({
         error: {
           message: `Request body must contain a new field`
         }
       });
     }
-    usersServices
+
+    postsService
       .updatePost(knex, id, newPostInfo)
       .then(() => {
         res.status(204).end();

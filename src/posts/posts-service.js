@@ -25,7 +25,7 @@ const postsService = {
       .first();
   },
 
-  deletePosts(db, post_id) {
+  deletePost(db, post_id) {
     return db("posts")
       .where({ post_id })
       .delete();
