@@ -59,6 +59,51 @@ makeWp = () => {
   ];
 };
 
+makePosts = () => {
+  return [
+    {
+      post_id: 1,
+      user_id: 1,
+      title: "Test Post",
+      content: "This is just a test post",
+      priority: 0,
+      user_img: "",
+      type: "posts",
+      wp_id: 1
+    },
+    {
+      post_id: 2,
+      user_id: 1,
+      title: "Test Post 2",
+      content: "This is just a second a test post",
+      priority: 0,
+      user_img: "",
+      type: "posts",
+      wp_id: 1
+    },
+    {
+      post_id: 3,
+      user_id: 2,
+      title: "Test Post",
+      content: "This is just a test post",
+      priority: 0,
+      user_img: "",
+      type: "posts",
+      wp_id: 2
+    },
+    {
+      post_id: 4,
+      user_id: 3,
+      title: "Test Post",
+      content: "This is just a test post",
+      priority: 0,
+      user_img: "",
+      type: "posts",
+      wp_id: 3
+    }
+  ];
+};
+
 makeMaliciousWp = () => {
   const maliciousWp = {
     wp_id: 1,
@@ -79,10 +124,6 @@ makeMaliciousWp = () => {
     maliciousWp,
     expectedWp
   };
-};
-
-makePosts = () => {
-  return [];
 };
 
 cleanTables = db => {
@@ -139,6 +180,16 @@ seedWp = (db, wp) => {
     );
 };
 
+seedPosts = (db, posts) => {
+  return db("posts")
+    .insert(posts)
+    .then(() =>
+      db.raw(`SELECT setval('posts_post_id_seq', ?)`, [
+        posts[posts.length - 1].post_id
+      ])
+    );
+};
+
 makeAuthHeader = (user, secret = process.env.JWT_SECRET) => {
   const token = jwt.sign({ user_id: user.user_id }, secret, {
     subject: user.username,
@@ -154,6 +205,7 @@ module.exports = {
   cleanTables,
   seedUsers,
   seedWp,
+  seedPosts,
   makeAuthHeader,
   makeMaliciousWp
 };

@@ -16,7 +16,6 @@ describe("users router", () => {
 
     app.set("db", db);
   });
-
   after("disconnect from db", () => db.destroy());
 
   before("cleanup", () => helpers.cleanTables(db));

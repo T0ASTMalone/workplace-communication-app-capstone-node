@@ -2,7 +2,7 @@ const knex = require("knex");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 
-describe.only("Wp endpoint", () => {
+describe("Wp endpoint", () => {
   let db;
   let testWp = helpers.makeWp();
   let testUsers = helpers.makeUsers();

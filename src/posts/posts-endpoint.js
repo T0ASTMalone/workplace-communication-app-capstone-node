@@ -62,7 +62,7 @@ postsRouter
   .all((req, res, next) => {
     const knex = req.app.get("db");
     const id = req.params.id;
-    usersService
+    postsService
       .getPostById(knex, id)
       .then(post => {
         if (!post) {

@@ -18,6 +18,13 @@ const postsService = {
       .where({ wp_id });
   },
 
+  getPostById(db, post_id) {
+    return db("posts")
+      .select("*")
+      .where({ post_id })
+      .first();
+  },
+
   deletePosts(db, post_id) {
     return db("posts")
       .where({ post_id })
@@ -30,9 +37,10 @@ const postsService = {
       .update(newPost);
   },
 
-  serializePost(db, post) {
+  serializePost(post) {
     return {
       user_id: post.user_id,
+      post_id: post.post_id,
       title: xss(post.title),
       type: post.type,
       priority: post.priority,
