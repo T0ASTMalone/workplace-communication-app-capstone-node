@@ -81,6 +81,10 @@ makeMaliciousWp = () => {
   };
 };
 
+makePosts = () => {
+  return [];
+};
+
 cleanTables = db => {
   return db.transaction(trx =>
     trx
@@ -146,6 +150,7 @@ makeAuthHeader = (user, secret = process.env.JWT_SECRET) => {
 module.exports = {
   makeUsers,
   makeWp,
+  makePosts,
   cleanTables,
   seedUsers,
   seedWp,
