@@ -96,7 +96,7 @@ describe.only("Posts router", () => {
       it("responds with 4", () => {
         return supertest(app)
           .get("/api/posts")
-          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .set("Authorization", helpers.makeAuthHeader(testsUser))
           .expect(200, testPosts);
       });
     });
