@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const { NODE_ENV } = require("./config");
 const usersRouter = require("./users/users-router");
 const wpRouter = require("./workplaces/workplaces-router");
+const postsRouter = require("./posts/posts-endpoint");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(helmet());
 app.use(cors());
 app.use("/api/wp", wpRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/posts", postsRouter);
 
 app.get("/", (req, res) => {
   res.status(200).send("Hello, world!");

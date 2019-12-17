@@ -138,7 +138,7 @@ usersRouter
     if (!newUserInfo) {
       return res.status(400).json({
         error: {
-          message: `Request body must contain a 'user name'`
+          message: `Request body must contain new info`
         }
       });
     }
