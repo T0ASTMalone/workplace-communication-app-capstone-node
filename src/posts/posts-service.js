@@ -2,7 +2,9 @@ const xss = require("xss");
 
 const postsService = {
   getAllPosts(db) {
-    return db("posts").select("*");
+    return db("posts")
+      .innerJoin("users", "posts.user_id", "users.user_id")
+      .select("posts.*", "users.nickname", "users.img");
   },
 
   createPost(db, post) {
@@ -12,49 +14,31 @@ const postsService = {
       .then(rows => rows[0]);
   },
 
-  // select * from posts as p inner join users as usr on p.user_id = em.user_id
-
   getWpPosts(db, wp_id, type) {
     console.log(wp_id, type);
     if (type === "all") {
       return db("posts")
         .innerJoin("users", "posts.user_id", "users.user_id")
         .select(
-          "posts.post_id",
+          "posts.*",
           "users.nickname",
-          "posts.user_id",
-          "posts.title",
-          "posts.content",
-          "users.img",
-          "posts.type",
-          "posts.priority",
-          "posts.date_added",
-          "posts.wp_id"
+
+          "users.img"
         )
         .where({ "posts.wp_id": wp_id });
     }
     return db("posts")
       .innerJoin("users", "posts.user_id", "users.user_id")
-      .select(
-        "posts.post_id",
-        "users.nickname",
-        "posts.user_id",
-        "posts.title",
-        "posts.content",
-        "users.img",
-        "posts.type",
-        "posts.priority",
-        "posts.date_added",
-        "posts.wp_id"
-      )
+      .select("posts.*", "users.nickname", "users.img")
       .where({ "posts.wp_id": wp_id })
       .where({ "posts.type": type });
   },
 
   getPostById(db, post_id) {
     return db("posts")
-      .select("*")
-      .where({ post_id })
+      .innerJoin("users", "posts.user_id", "users.user_id")
+      .select("posts.*", "users.nickname", "users.img")
+      .where({ "posts.post_id": post_id })
       .first();
   },
 
