@@ -30,7 +30,7 @@ describe.only("Posts router", () => {
   });
 
   describe("GET /api/posts/:id", () => {
-    context.only("Given there are posts in the db", () => {
+    context("Given there are posts in the db", () => {
       beforeEach("seed users and wp and posts", () => {
         helpers.seedPosts(db, testPosts);
       });
@@ -44,7 +44,7 @@ describe.only("Posts router", () => {
           .expect(200, expectedPost);
       });
 
-      it("Responds with 201", () => {
+      it("Responds with 201 and deletes post", () => {
         return supertest(app)
           .delete(`/api/posts/${testPosts[0].post_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
@@ -98,6 +98,25 @@ describe.only("Posts router", () => {
           .get("/api/posts")
           .set("Authorization", helpers.makeAuthHeader(testsUser))
           .expect(200, testPosts);
+      });
+    });
+  });
+
+  describe.only("GET /api/posts/wp/:wpId", () => {
+    context.only("given there are posts in the db", () => {
+      beforeEach("Seed wp and users", () => {
+        helpers.seedPosts(db, testPosts);
+      });
+
+      let expectedPosts = helpers.makeExpectedPosts();
+
+      const testUser = testUsers[0];
+
+      it("responds with wp posts", () => {
+        return supertest(app)
+          .get(`/api/posts/wp/${1}`)
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(200, expectedPosts);
       });
     });
   });

@@ -114,10 +114,13 @@ postsRouter
   .get((req, res, next) => {
     const knex = req.app.get("db");
     const id = req.params.id;
+    const type = req.query.type || "all";
+
     postsService
-      .getWpPosts(knex, id)
+      .getWpPosts(knex, id, type)
       .then(posts => {
-        res.json(posts.map(posts => postsService.serializePost(posts)));
+        console.log("posts", posts);
+        return res.json(posts.map(posts => postsService.serializePost(posts)));
       })
       .catch(next);
   });

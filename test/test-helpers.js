@@ -8,7 +8,6 @@ makeUsers = () => {
       username: "Test user 1",
       password: "Thisis@testpassowrd!",
       wp_id: 1,
-      wp_name: "TEST COMPANY 1",
       type: "creator",
       nickname: "Test nickname 1",
       img: null
@@ -18,7 +17,6 @@ makeUsers = () => {
       username: "Test user 2",
       password: "Thisis@testpassowrd!",
       wp_id: 2,
-      wp_name: "TEST COMPANY 2",
       type: "creator",
       nickname: "Test nickname 1",
       img: null
@@ -28,7 +26,6 @@ makeUsers = () => {
       username: "Test user 3",
       password: "Thisis@testpassowrd!",
       wp_id: 3,
-      wp_name: "TEST COMPANY 3",
       type: "creator",
       nickname: "Test nickname 1",
       img: null
@@ -67,7 +64,6 @@ makePosts = () => {
       title: "Test Post",
       content: "This is just a test post",
       priority: 0,
-      user_img: "",
       type: "posts",
       wp_id: 1
     },
@@ -77,7 +73,6 @@ makePosts = () => {
       title: "Test Post 2",
       content: "This is just a second a test post",
       priority: 0,
-      user_img: "",
       type: "posts",
       wp_id: 1
     },
@@ -87,7 +82,6 @@ makePosts = () => {
       title: "Test Post",
       content: "This is just a test post",
       priority: 0,
-      user_img: "",
       type: "posts",
       wp_id: 2
     },
@@ -97,9 +91,35 @@ makePosts = () => {
       title: "Test Post",
       content: "This is just a test post",
       priority: 0,
-      user_img: "",
       type: "posts",
       wp_id: 3
+    }
+  ];
+};
+
+makeExpectedPosts = () => {
+  return [
+    {
+      post_id: 2,
+      user_id: 1,
+      title: "Test Post 2",
+      content: "This is just a second a test post",
+      priority: 0,
+      type: "posts",
+      wp_id: 1,
+      nickname: "Test nickname 1",
+      img: null
+    },
+    {
+      post_id: 1,
+      user_id: 1,
+      title: "Test Post",
+      content: "This is just a test post",
+      priority: 0,
+      type: "posts",
+      wp_id: 1,
+      nickname: "Test nickname 1",
+      img: null
     }
   ];
 };
@@ -208,5 +228,6 @@ module.exports = {
   seedWp,
   seedPosts,
   makeAuthHeader,
-  makeMaliciousWp
+  makeMaliciousWp,
+  makeExpectedPosts
 };
