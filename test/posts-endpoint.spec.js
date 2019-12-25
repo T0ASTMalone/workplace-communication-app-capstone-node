@@ -103,7 +103,7 @@ describe.only("Posts router", () => {
   });
 
   describe.only("GET /api/posts/wp/:wpId", () => {
-    context.only("given there are posts in the db", () => {
+    context.only("Get all posts for a wp", () => {
       beforeEach("Seed wp and users", () => {
         helpers.seedPosts(db, testPosts);
       });
@@ -117,6 +117,27 @@ describe.only("Posts router", () => {
           .get(`/api/posts/wp/${1}`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(200, expectedPosts);
+      });
+    });
+
+    context.only("Get all posts for a wp with type post", () => {
+      beforeEach("Seed wp and users", () => {
+        helpers.seedPosts(db, testPosts);
+      });
+
+      let expectedPosts = helpers.makeExpectedPosts();
+
+      const testUser = testUsers[0];
+
+      let types = ["posts", "idea"];
+
+      types.forEach((type, i) => {
+        it("responds with wp posts", () => {
+          return supertest(app)
+            .get(`/api/posts/wp/${1}?type=${type}`)
+            .set("Authorization", helpers.makeAuthHeader(testUser))
+            .expect(200, [expectedPosts[i]]);
+        });
       });
     });
   });

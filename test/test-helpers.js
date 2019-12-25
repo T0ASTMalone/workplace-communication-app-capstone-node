@@ -64,7 +64,7 @@ makePosts = () => {
       title: "Test Post",
       content: "This is just a test post",
       priority: 0,
-      type: "posts",
+      type: "idea",
       wp_id: 1
     },
     {
@@ -116,7 +116,7 @@ makeExpectedPosts = () => {
       title: "Test Post",
       content: "This is just a test post",
       priority: 0,
-      type: "posts",
+      type: "idea",
       wp_id: 1,
       nickname: "Test nickname 1",
       img: null

@@ -119,7 +119,6 @@ postsRouter
     postsService
       .getWpPosts(knex, id, type)
       .then(posts => {
-        console.log("posts", posts);
         return res.json(posts.map(posts => postsService.serializePost(posts)));
       })
       .catch(next);
