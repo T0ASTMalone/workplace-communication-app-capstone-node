@@ -37,6 +37,7 @@ const postsService = {
 
   serializePost(ack) {
     return {
+      id: ack.id,
       user_id: ack.user_id,
       nickname: xss(ack.nickname),
       post_id: ack.post_id

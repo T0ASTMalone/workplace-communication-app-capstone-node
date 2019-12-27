@@ -18,7 +18,7 @@ makeUsers = () => {
       password: "Thisis@testpassowrd!",
       wp_id: 2,
       type: "creator",
-      nickname: "Test nickname 1",
+      nickname: "Test nickname 2",
       img: null
     },
     {
@@ -27,7 +27,7 @@ makeUsers = () => {
       password: "Thisis@testpassowrd!",
       wp_id: 3,
       type: "creator",
-      nickname: "Test nickname 1",
+      nickname: "Test nickname 3",
       img: null
     }
   ];
@@ -124,6 +124,27 @@ makeExpectedPosts = () => {
   ];
 };
 
+makeAcks = () => {
+  const acksToPost = [
+    { id: 1, user_id: 2, post_id: 1 },
+    { id: 2, user_id: 3, post_id: 1 },
+    { id: 3, user_id: 2, post_id: 2 },
+    { id: 4, user_id: 3, post_id: 2 },
+    { id: 5, user_id: 1, post_id: 3 },
+    { id: 6, user_id: 3, post_id: 3 }
+  ];
+  const expectedAcks = [
+    { id: 1, user_id: 2, post_id: 1, nickname: "Test nickname 2" },
+    { id: 2, user_id: 3, post_id: 1, nickname: "Test nickname 3" },
+    { id: 3, user_id: 2, post_id: 2, nickname: "Test nickname 2" },
+    { id: 4, user_id: 3, post_id: 2, nickname: "Test nickname 3" },
+    { id: 5, user_id: 1, post_id: 3, nickname: "Test nickname 1" },
+    { id: 6, user_id: 3, post_id: 3, nickname: "Test nickname 3" }
+  ];
+
+  return { acksToPost, expectedAcks };
+};
+
 makeMaliciousWp = () => {
   const maliciousWp = {
     wp_id: 1,
@@ -210,6 +231,14 @@ seedPosts = (db, posts) => {
     );
 };
 
+seedAcks = (db, acks) => {
+  return db("seen")
+    .insert(acks)
+    .then(() =>
+      db.raw(`SELECT setval('seen_id_seq', ?)`, [acks[acks.length - 1].id])
+    );
+};
+
 makeAuthHeader = (user, secret = process.env.JWT_SECRET) => {
   const token = jwt.sign({ user_id: user.user_id }, secret, {
     subject: user.username,
@@ -222,10 +251,12 @@ module.exports = {
   makeUsers,
   makeWp,
   makePosts,
+  makeAcks,
   cleanTables,
   seedUsers,
   seedWp,
   seedPosts,
+  seedAcks,
   makeAuthHeader,
   makeMaliciousWp,
   makeExpectedPosts

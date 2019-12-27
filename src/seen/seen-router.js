@@ -1,10 +1,13 @@
 const path = require("path");
 const express = require("express");
-const seenService = require("./posts-service");
+const seenService = require("./seen-service");
 const { requireAuth } = require("../middleware/jwt-auth");
 const seenRouter = express.Router();
 
 const jsonParser = express.json();
+
+// ack is short for acknowledgement
+// acknowledgement or acknowledgements seemed like to long of a variable nickname lol
 
 seenRouter
   .route("/")
@@ -14,7 +17,6 @@ seenRouter
     seenService
       .getAllAcks(knex)
       .then(acks => {
-        console.log("these are all the posts we have", acks);
         return res
           .status(200)
           .json(acks.map(ack => seenService.serializePost(ack)));
@@ -70,9 +72,6 @@ seenRouter
       })
       .catch(next);
   })
-  .get((req, res, next) => {
-    return res.json(seenService.serializeAck(res.ack));
-  })
   .delete((req, res, next) => {
     const knex = req.app.get("db");
     const id = req.params.id;
@@ -99,4 +98,4 @@ seenRouter
       .catch(next);
   });
 
-module.exports = postsRouter;
+module.exports = seenRouter;

@@ -7,6 +7,7 @@ const { NODE_ENV } = require("./config");
 const usersRouter = require("./users/users-router");
 const wpRouter = require("./workplaces/workplaces-router");
 const postsRouter = require("./posts/posts-endpoint");
+const seenRouter = require("./seen/seen-router");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors());
 app.use("/api/wp", wpRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/posts", postsRouter);
+app.use("/api/seen", seenRouter);
 
 app.get("/", (req, res) => {
   res.status(200).send("Hello, world!");

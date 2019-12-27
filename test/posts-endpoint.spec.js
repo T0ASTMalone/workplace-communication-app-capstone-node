@@ -3,7 +3,7 @@ const app = require("../src/app");
 const helpers = require("./test-helpers");
 const bcrypt = require("bcryptjs");
 
-describe.only("Posts router", () => {
+describe("Posts router", () => {
   let db;
   let testWp = helpers.makeWp();
   let testUsers = helpers.makeUsers();
@@ -79,7 +79,7 @@ describe.only("Posts router", () => {
     });
   });
 
-  describe.only("GET /api/posts", () => {
+  describe("GET /api/posts", () => {
     context("given there are no posts", () => {
       const testUser = testUsers[0];
       it("responds with 404", () => {
