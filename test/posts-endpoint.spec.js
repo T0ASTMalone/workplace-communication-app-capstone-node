@@ -90,7 +90,7 @@ describe.only("Posts router", () => {
       });
     });
     // passes on its own but not when ran alongside other test
-    context.only("given there are posts in the db", () => {
+    context("given there are posts in the db", () => {
       beforeEach("Seed wp and users", () => {
         helpers.seedPosts(db, testPosts);
       });

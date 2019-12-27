@@ -15,6 +15,7 @@ const postsService = {
   },
 
   getWpPosts(db, wp_id, type) {
+    // need to query seen table for count of likes
     if (type === "all") {
       return db("posts")
         .innerJoin("users", "posts.user_id", "users.user_id")
