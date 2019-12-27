@@ -201,7 +201,6 @@ seedWp = (db, wp) => {
 };
 
 seedPosts = (db, posts) => {
-  //console.log(posts);
   return db("posts")
     .insert(posts)
     .then(() =>

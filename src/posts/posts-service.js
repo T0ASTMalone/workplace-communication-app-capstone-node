@@ -15,16 +15,10 @@ const postsService = {
   },
 
   getWpPosts(db, wp_id, type) {
-    console.log(wp_id, type);
     if (type === "all") {
       return db("posts")
         .innerJoin("users", "posts.user_id", "users.user_id")
-        .select(
-          "posts.*",
-          "users.nickname",
-
-          "users.img"
-        )
+        .select("posts.*", "users.nickname", "users.img")
         .where({ "posts.wp_id": wp_id });
     }
     return db("posts")

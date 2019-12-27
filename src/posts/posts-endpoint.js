@@ -14,6 +14,7 @@ postsRouter
     postsService
       .getAllPosts(knex)
       .then(posts => {
+        console.log("these are all the posts we have", posts);
         return res
           .status(200)
           .json(posts.map(posts => postsService.serializePost(posts)));
@@ -67,6 +68,7 @@ postsRouter
     postsService
       .getPostById(knex, id)
       .then(post => {
+        console.log("get post by id ", post);
         if (!post) {
           return res.status(404).json({ error: { message: `Post not found` } });
         }

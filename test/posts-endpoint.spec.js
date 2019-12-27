@@ -37,13 +37,17 @@ describe.only("Posts router", () => {
       const testUser = testUsers[0];
 
       it("responds with 200 and the post", () => {
-        const expectedPost = testPosts[0];
+        const expectedPost = helpers.makeExpectedPosts();
+
         return supertest(app)
-          .get(`/api/posts/${expectedPost.post_id}`)
+          .get(`/api/posts/${expectedPost[1].post_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
-          .expect(200, expectedPost);
+          .expect(200, expectedPost[1]);
       });
 
+      // these 2 need to move to their own describe blocks
+      // both pass on their own but not when other test are ran at the
+      // same time
       it("Responds with 201 and deletes post", () => {
         return supertest(app)
           .delete(`/api/posts/${testPosts[0].post_id}`)
@@ -75,7 +79,7 @@ describe.only("Posts router", () => {
     });
   });
 
-  describe("GET /api/posts", () => {
+  describe.only("GET /api/posts", () => {
     context("given there are no posts", () => {
       const testUser = testUsers[0];
       it("responds with 404", () => {
@@ -85,25 +89,25 @@ describe.only("Posts router", () => {
           .expect(200, []);
       });
     });
-
-    context("given there are posts in the db", () => {
+    // passes on its own but not when ran alongside other test
+    context.only("given there are posts in the db", () => {
       beforeEach("Seed wp and users", () => {
         helpers.seedPosts(db, testPosts);
       });
 
       const testUser = testUsers[0];
 
-      it("responds with 4", () => {
+      it("responds with all posts", () => {
         return supertest(app)
           .get("/api/posts")
-          .set("Authorization", helpers.makeAuthHeader(testsUser))
+          .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(200, testPosts);
       });
     });
   });
 
-  describe.only("GET /api/posts/wp/:wpId", () => {
-    context.only("Get all posts for a wp", () => {
+  describe("GET /api/posts/wp/:wpId", () => {
+    context("Get all posts for a wp", () => {
       beforeEach("Seed wp and users", () => {
         helpers.seedPosts(db, testPosts);
       });
@@ -120,7 +124,7 @@ describe.only("Posts router", () => {
       });
     });
 
-    context.only("Get all posts for a wp with type post", () => {
+    context("Get all posts for a wp with type post", () => {
       beforeEach("Seed wp and users", () => {
         helpers.seedPosts(db, testPosts);
       });
