@@ -22,7 +22,7 @@ postsRouter
   })
   .post(jsonParser, (req, res, next) => {
     const knex = req.app.get("db");
-    const { user_id, title, type, priority, wp_id, content } = req.body;
+    const { user_id, title, type, priority = 0, wp_id, content } = req.body;
     // create posts object that includes the wpId
     const posts = { user_id, title, type, priority, wp_id, content };
     // check if there is a posts in the req body
