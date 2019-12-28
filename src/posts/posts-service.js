@@ -32,7 +32,6 @@ const postsService = {
     if (type === "all") {
       return db("posts")
         .innerJoin("users", "posts.user_id", "users.user_id")
-
         .select(
           "posts.*",
           "users.nickname",

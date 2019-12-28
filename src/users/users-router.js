@@ -133,7 +133,7 @@ usersRouter
       })
       .catch(next);
   })
-  .patch((req, res, next) => {
+  .patch(jsonParser, (req, res, next) => {
     const knex = req.app.get("db");
     const id = req.params.id;
     const newUserInfo = req.body;
@@ -144,7 +144,7 @@ usersRouter
         }
       });
     }
-    usersServices
+    usersService
       .updateUser(knex, id, newUserInfo)
       .then(() => {
         res.status(204).end();

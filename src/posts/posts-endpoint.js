@@ -99,7 +99,7 @@ postsRouter
   });
 
 postsRouter
-  .route("/wp/:id")
+  .route("/:id/wp")
   .all(requireAuth)
   .get((req, res, next) => {
     const knex = req.app.get("db");
