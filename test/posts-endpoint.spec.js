@@ -30,7 +30,7 @@ describe.only("Posts router", () => {
     helpers.seedUsers(db, testUsers);
   });
 
-  describe.only("GET /api/posts", () => {
+  describe("GET /api/posts", () => {
     context("given there are no posts", () => {
       const testUser = testUsers[0];
       it("responds with 404", () => {
@@ -54,6 +54,58 @@ describe.only("Posts router", () => {
           .get("/api/posts")
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(200, expectedPosts);
+      });
+    });
+  });
+
+  describe.only("POST /api/posts", () => {
+    const testUser = testUsers[0];
+    context("Given there is missing field", () => {
+      const requiredFields = [
+        "user_id",
+        "title",
+        "type",
+        "priority",
+        "wp_id",
+        "content"
+      ];
+
+      requiredFields.forEach(field => {
+        const testPost = {
+          user_id: 1,
+          title: "This is a test title",
+          type: "posts",
+          priority: 0,
+          wp_id: 1,
+          content: "this is a test post"
+        };
+        delete testPost[field];
+        it("responds with 400 Missing field in request body", () => {
+          return supertest(app)
+            .post("/api/posts")
+            .set("Authorization", helpers.makeAuthHeader(testUser))
+            .send(testPost)
+            .expect(400, { error: `Missing '${field}' in request body` });
+        });
+      });
+    });
+
+    context("Happy path", () => {
+      const testPost = {
+        user_id: 1,
+        title: "This is a test title",
+        type: "posts",
+        priority: 0,
+        wp_id: 1,
+        content: "this is a test post"
+      };
+
+      it("responds with 201 and the new post", () => {
+        return supertest(app)
+          .post("/api/posts")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .send(testPost)
+          .expect(201);
       });
     });
   });

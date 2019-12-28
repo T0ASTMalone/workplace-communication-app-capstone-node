@@ -22,17 +22,9 @@ postsRouter
   })
   .post(jsonParser, (req, res, next) => {
     const knex = req.app.get("db");
-    const {
-      user_id,
-      title,
-      type,
-      priority,
-      wp_id,
-      user_img,
-      content
-    } = req.body;
+    const { user_id, title, type, priority, wp_id, content } = req.body;
     // create posts object that includes the wpId
-    const posts = { user_id, title, type, priority, wp_id, user_img, content };
+    const posts = { user_id, title, type, priority, wp_id, content };
     // check if there is a posts in the req body
     if (!posts) {
       return res
@@ -42,15 +34,13 @@ postsRouter
     // check for missing fields
     for (const [key, value] of Object.entries(posts)) {
       if (value == null) {
-        if (key !== "nickname" && key !== "img") {
-          return res.status(400).json({
-            error: `Missing '${key}' in request body`
-          });
-        }
+        return res.status(400).json({
+          error: `Missing '${key}' in request body`
+        });
       }
     }
     //create post
-    postsService.createPost(knex, post).then(post => {
+    postsService.createPost(knex, posts).then(post => {
       return res
         .status(201)
         .location(path.posix.join(`/api/posts` + `/${post.post_id}`))
