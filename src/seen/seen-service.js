@@ -7,7 +7,14 @@ const postsService = {
       .select("seen.*", "users.nickname");
   },
 
-  createPost(db, ack) {
+  postExists(db, post_id) {
+    return db("posts")
+      .where({ post_id })
+      .first()
+      .then(post => !!post);
+  },
+
+  createAck(db, ack) {
     return db("seen")
       .insert(ack)
       .returning("*")
@@ -35,7 +42,7 @@ const postsService = {
       .where({ "seen.post_id": post_id });
   },
 
-  serializePost(ack) {
+  serializeAck(ack) {
     return {
       id: ack.id,
       user_id: ack.user_id,

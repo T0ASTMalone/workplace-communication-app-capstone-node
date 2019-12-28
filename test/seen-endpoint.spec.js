@@ -10,8 +10,6 @@ describe.only("Posts router", () => {
   let testPosts = helpers.makePosts();
   let { acksToPost, expectedAcks } = helpers.makeAcks();
 
-  let testUser = testUsers[0];
-
   before("make knex instance", () => {
     db = knex({
       client: "pg",
@@ -54,6 +52,69 @@ describe.only("Posts router", () => {
           .get("/api/seen")
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(200, expectedAcks);
+      });
+    });
+  });
+
+  describe.only("POST api/seen", () => {
+    const testUser = testUsers[0];
+    context("Given there is missing data in post request", () => {
+      const fields = ["user_id", "post_id"];
+
+      fields.forEach(field => {
+        const ack = {
+          user_id: 1,
+          post_id: 3
+        };
+
+        it(`responds with 'Missing acknowledgement in request body'`, () => {
+          delete ack[field];
+          return supertest(app)
+            .post("/api/seen")
+            .set("Authorization", helpers.makeAuthHeader(testUser))
+            .send(ack)
+            .expect(400, {
+              error: `Missing '${field}' in request body`
+            });
+        });
+      });
+    });
+
+    context("Given the post does not or no longer exists", () => {
+      const ack = {
+        user_id: 1,
+        post_id: 200
+      };
+
+      it(`responds with 400 'post does not or no longer exists'`, () => {
+        return supertest(app)
+          .post("/api/seen")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .send(ack)
+          .expect(400, {
+            error: `Post does not or no longer exists`
+          });
+      });
+    });
+
+    context("Happy path", () => {
+      const testUser = testUsers[0];
+      const ack = {
+        user_id: testUser.user_id,
+        post_id: 4
+      };
+      it("responds with 201 and the new acknowledgement", () => {
+        return supertest(app)
+          .post("/api/seen")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .send(ack)
+          .expect(201)
+          .expect(res => {
+            expect(res.body).to.have.property("id");
+            expect(res.body.user_id).to.eql(testUser.user_id);
+            expect(res.body.post_id).to.eql(ack.post_id);
+            expect(res.headers.location).to.eql(`/api/seen/${res.body.id}`);
+          });
       });
     });
   });

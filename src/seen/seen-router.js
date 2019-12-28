@@ -28,28 +28,39 @@ seenRouter
     const { user_id, post_id } = req.body;
     // create acknowledgement
     const ack = { user_id, post_id };
+    console.log(ack);
     // check if there is a posts in the req body
     if (!ack) {
       return res.status(400).json({
         error: { message: `Missing acknowledgement in request body` }
       });
     }
+
     // check for missing fields
     for (const [key, value] of Object.entries(ack)) {
       if (value == null) {
-        if (key !== "nickname" && key !== "img") {
-          return res.status(400).json({
-            error: `Missing '${key}' in request body`
-          });
-        }
+        return res.status(400).json({
+          error: `Missing '${key}' in request body`
+        });
       }
     }
-    //create acknowledgement
-    seenService.createAck(knex, ack).then(ack => {
-      return res
-        .status(201)
-        .location(path.posix.join(`/api/seen` + `/${ack.id}`))
-        .json(postsService.serializeAck(ack));
+
+    //check if post exists
+    seenService.postExists(knex, ack.post_id).then(postExists => {
+      console.log(postExists);
+      if (!postExists) {
+        console.log("ran post not found");
+        return res.status(400).json({
+          error: `Post does not or no longer exists`
+        });
+      }
+      //create acknowledgement
+      seenService.createAck(knex, ack).then(ack => {
+        return res
+          .status(201)
+          .location(path.posix.join(`/api/seen` + `/${ack.id}`))
+          .json(seenService.serializeAck(ack));
+      });
     });
   });
 
