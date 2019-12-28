@@ -22,7 +22,7 @@ const postsService = {
   },
 
   getAckById(db, id) {
-    return db("posts")
+    return db("seen")
       .innerJoin("users", "seen.user_id", "users.user_id")
       .select("seen.*", "users.nickname")
       .where({ "seen.id": id })

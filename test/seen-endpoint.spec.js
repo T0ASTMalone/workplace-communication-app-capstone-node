@@ -56,7 +56,7 @@ describe.only("Posts router", () => {
     });
   });
 
-  describe.only("POST api/seen", () => {
+  describe("POST api/seen", () => {
     const testUser = testUsers[0];
     context("Given there is missing data in post request", () => {
       const fields = ["user_id", "post_id"];
@@ -115,6 +115,42 @@ describe.only("Posts router", () => {
             expect(res.body.post_id).to.eql(ack.post_id);
             expect(res.headers.location).to.eql(`/api/seen/${res.body.id}`);
           });
+      });
+    });
+  });
+
+  describe.only("DELETE /api/seen/:id", () => {
+    const testUser = testUsers[0];
+    context("Given ack does not exits", () => {
+      it(`responds with 400 'Acknowledgement not found'`, () => {
+        return supertest(app)
+          .delete("/api/seen/200")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(404, { error: { message: "Acknowledgement not found" } });
+      });
+    });
+
+    context("Given there are acks in db", () => {
+      beforeEach("Seed acks", async () => {
+        await helpers.seedAcks(db, acksToPost);
+      });
+
+      const deletedAck = expectedAcks.filter(ack => ack.id !== 1);
+
+      it("responds with 204", () => {
+        return supertest(app)
+          .delete("/api/seen/1")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(204)
+          .expect(res =>
+            db
+              .from("seen")
+              .innerJoin("users", "seen.user_id", "users.user_id")
+              .select("seen.*", "users.nickname")
+              .then(acks => {
+                expect(acks).to.eql(deletedAck);
+              })
+          );
       });
     });
   });

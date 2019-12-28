@@ -85,8 +85,9 @@ seenRouter
   })
   .delete((req, res, next) => {
     const knex = req.app.get("db");
-    const id = req.params.id;
-    ackService
+    const id = res.ack.id;
+    console.log("id to delete ", id);
+    seenService
       .deleteAck(knex, id)
       .then(() => {
         return res.status(204).end();
