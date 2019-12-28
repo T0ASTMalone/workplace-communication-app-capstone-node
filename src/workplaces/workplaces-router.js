@@ -80,7 +80,6 @@ wpRouter
     wpService
       .getWpUsers(knex, id)
       .then(wp => {
-        console.log(wp);
         if (wp > 1) {
           return res
             .status(400)
@@ -96,7 +95,7 @@ wpRouter
     wpService
       .deleteWp(knex, id)
       .then(() => {
-        return res.status(201).end();
+        return res.status(201).json();
       })
       .catch(next);
   });
