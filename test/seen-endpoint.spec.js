@@ -119,7 +119,7 @@ describe.only("Posts router", () => {
     });
   });
 
-  describe.only("DELETE /api/seen/:id", () => {
+  describe("DELETE /api/seen/:id", () => {
     const testUser = testUsers[0];
     context("Given ack does not exits", () => {
       it(`responds with 400 'Acknowledgement not found'`, () => {
@@ -151,6 +151,37 @@ describe.only("Posts router", () => {
                 expect(acks).to.eql(deletedAck);
               })
           );
+      });
+    });
+  });
+
+  describe("GET /api/seen/post/:id", () => {
+    const testUser = testUsers[0];
+
+    context("Given post does not or no longer exist", () => {
+      it(`responds with 404 'Post does not or no longer exists'`, () => {
+        return supertest(app)
+          .get("/api/seen/post/200")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(404, {
+            error: { message: "Post does not or no longer exists" }
+          });
+      });
+    });
+
+    context("Given post exists", () => {
+      beforeEach("seed acks", () => {
+        helpers.seedAcks(db, acksToPost);
+      });
+
+      const postId = 1;
+      const postAcks = expectedAcks.filter(ack => ack.post_id === postId);
+
+      it("responds with 200 and the post acks", () => {
+        return supertest(app)
+          .get(`/api/seen/post/${postId}`)
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(200, postAcks);
       });
     });
   });

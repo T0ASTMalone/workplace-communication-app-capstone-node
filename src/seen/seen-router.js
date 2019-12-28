@@ -19,7 +19,7 @@ seenRouter
       .then(acks => {
         return res
           .status(200)
-          .json(acks.map(ack => seenService.serializePost(ack)));
+          .json(acks.map(ack => seenService.serializeAck(ack)));
       })
       .catch(next);
   })
@@ -98,14 +98,30 @@ seenRouter
 seenRouter
   .route("/post/:id")
   .all(requireAuth)
+  .all((req, res, next) => {
+    const knex = req.app.get("db");
+    const id = req.params.id;
+    seenService
+      .postExists(knex, id)
+      .then(post => {
+        if (!post) {
+          return res
+            .status(404)
+            .json({ error: { message: `Post does not or no longer exists` } });
+        }
+        next();
+      })
+      .catch(next);
+  })
   .get((req, res, next) => {
     const knex = req.app.get("db");
     const id = req.params.id;
-
     seenService
       .getPostAcks(knex, id)
       .then(acks => {
-        return res.json(acks.map(ack => postsService.serializeAck(ack)));
+        return res
+          .status(200)
+          .json(acks.map(ack => seenService.serializeAck(ack)));
       })
       .catch(next);
   });
