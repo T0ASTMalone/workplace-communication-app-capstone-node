@@ -44,7 +44,7 @@ wpRouter
         return res
           .status(201)
           .location(path.posix.join(req.originalUrl + `/${newWp.wp_id}`))
-          .json(wpService.serializeWp(newWp));
+          .json(wpService.serializeWp(newWp, true));
       })
       .catch(next);
   });

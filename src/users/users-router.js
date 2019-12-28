@@ -19,9 +19,11 @@ usersRouter
   })
   .post(jsonParser, (req, res, next) => {
     const knex = req.app.get("db");
+
     const { username, password, code, type, nickname, img } = req.body;
     // find WorkPlace with code provided
     // create user object that includes the wpId and wpName
+
     const user = {
       username,
       type,
@@ -40,7 +42,7 @@ usersRouter
     // check for missing fields
     for (const [key, value] of Object.entries(user)) {
       if (value == null) {
-        if (key !== "nickname" && key !== "img") {
+        if (key !== "img") {
           return res.status(400).json({
             error: `Missing '${key}' in request body`
           });
@@ -65,12 +67,12 @@ usersRouter
             .status(404)
             .json({ error: { message: `Invalid WorkPlace Code` } });
         }
+        console.log(type);
         // else get wpId and wpName if WorkPlace
-        if (type !== "creator" || type !== "user") {
+        if (type !== "creator") {
           user.type = "pending";
         }
         user.wp_id = wp.wp_id;
-        user.wp_name = wp.wp_name;
 
         delete user.code;
 
@@ -89,6 +91,7 @@ usersRouter
             user.password = hashedPass;
             // create user
             return usersService.createUsr(knex, user).then(user => {
+              console.log(user);
               // respond with new user
               res
                 .status(201)

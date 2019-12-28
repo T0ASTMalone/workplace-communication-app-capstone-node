@@ -8,6 +8,7 @@ const usersRouter = require("./users/users-router");
 const wpRouter = require("./workplaces/workplaces-router");
 const postsRouter = require("./posts/posts-endpoint");
 const seenRouter = require("./seen/seen-router");
+const authRouter = require("./auth/auth-router");
 
 const app = express();
 
@@ -16,6 +17,7 @@ const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
+app.use("/api/auth", authRouter);
 app.use("/api/wp", wpRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/posts", postsRouter);

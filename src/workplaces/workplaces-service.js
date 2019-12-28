@@ -19,7 +19,15 @@ const wpService = {
       .first();
   },
 
-  serializeWp(wp) {
+  serializeWp(wp, created) {
+    if (created) {
+      return {
+        wp_id: wp.wp_id,
+        wp_name: xss(wp.wp_name),
+        type: wp.type,
+        wp_code: wp.wp_code
+      };
+    }
     return {
       wp_id: wp.wp_id,
       wp_name: xss(wp.wp_name),
