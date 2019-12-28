@@ -72,4 +72,33 @@ wpRouter
     res.json(wpService.serializeWp(res.wp));
   });
 
+wpRouter
+  .route("/err/:id")
+  .all((req, res, next) => {
+    let knex = req.app.get("db");
+    let id = req.params.id;
+    wpService
+      .getWpUsers(knex, id)
+      .then(wp => {
+        console.log(wp);
+        if (wp > 1) {
+          return res
+            .status(400)
+            .json({ error: { message: `Can't delete workplace` } });
+        }
+        next();
+      })
+      .catch(next);
+  })
+  .delete((req, res, next) => {
+    const knex = req.app.get("db");
+    const id = req.params.id;
+    wpService
+      .deleteWp(knex, id)
+      .then(() => {
+        return res.status(201).end();
+      })
+      .catch(next);
+  });
+
 module.exports = wpRouter;

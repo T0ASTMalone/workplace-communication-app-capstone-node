@@ -19,6 +19,21 @@ const wpService = {
       .first();
   },
 
+  getWpUsers(db, wp_id) {
+    return db("users")
+      .select("*")
+      .count("*")
+      .where({ wp_id })
+      .as("numOfUsers")
+      .groupBy("users.user_id");
+  },
+
+  deleteWp(db, wp_id) {
+    return db("workplaces")
+      .where({ wp_id })
+      .delete();
+  },
+
   serializeWp(wp, created) {
     if (created) {
       return {
