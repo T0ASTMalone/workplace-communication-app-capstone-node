@@ -3,9 +3,10 @@ const jwt = require("jsonwebtoken");
 const config = require("../config");
 
 const AuthService = {
-  getUserWithEmail(db, username) {
+  getUserWithNickname(db, nickname, type) {
     return db("users")
-      .where({ username })
+      .where({ nickname })
+      .where({ type })
       .first();
   },
   parseBasicToken(token) {
