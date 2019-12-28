@@ -28,7 +28,6 @@ seenRouter
     const { user_id, post_id } = req.body;
     // create acknowledgement
     const ack = { user_id, post_id };
-    console.log(ack);
     // check if there is a posts in the req body
     if (!ack) {
       return res.status(400).json({
@@ -47,9 +46,7 @@ seenRouter
 
     //check if post exists
     seenService.postExists(knex, ack.post_id).then(postExists => {
-      console.log(postExists);
       if (!postExists) {
-        console.log("ran post not found");
         return res.status(400).json({
           error: `Post does not or no longer exists`
         });
@@ -86,7 +83,6 @@ seenRouter
   .delete((req, res, next) => {
     const knex = req.app.get("db");
     const id = res.ack.id;
-    console.log("id to delete ", id);
     seenService
       .deleteAck(knex, id)
       .then(() => {
