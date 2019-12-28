@@ -7,7 +7,7 @@ describe.only("Posts router", () => {
   let db;
   let testWp = helpers.makeWp();
   let testUsers = helpers.makeUsers();
-  let testPosts = helpers.makePosts();
+  let { testPosts, expectedPosts } = helpers.makePosts();
   let { acksToPost } = helpers.makeAcks();
 
   before("make knex instance", () => {
@@ -30,7 +30,35 @@ describe.only("Posts router", () => {
     helpers.seedUsers(db, testUsers);
   });
 
-  describe.only("GET /api/posts/:id", () => {
+  describe.only("GET /api/posts", () => {
+    context("given there are no posts", () => {
+      const testUser = testUsers[0];
+      it("responds with 404", () => {
+        return supertest(app)
+          .get("/api/posts")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(200, []);
+      });
+    });
+
+    context("given there are posts in the db", () => {
+      beforeEach("Seed posts", async () => {
+        await helpers.seedPosts(db, testPosts);
+        await helpers.seedAcks(db, acksToPost);
+      });
+
+      const testUser = testUsers[0];
+
+      it("responds with all posts", () => {
+        return supertest(app)
+          .get("/api/posts")
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(200, expectedPosts);
+      });
+    });
+  });
+
+  describe("GET /api/posts/:id", () => {
     context("Given there are posts in the db", () => {
       beforeEach("seed users and wp and posts", async () => {
         await helpers.seedPosts(db, testPosts);
@@ -38,14 +66,14 @@ describe.only("Posts router", () => {
       });
       const testUser = testUsers[0];
 
-      it.only("responds with 200 and the post", () => {
-        const expectedPost = helpers.makeExpectedPosts();
+      it("responds with 200 and the post", () => {
+        const { expectedPosts } = helpers.makePosts();
 
         return supertest(app)
-          .get(`/api/posts/${expectedPost[1].post_id}`)
+          .get(`/api/posts/${expectedPosts[0].post_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(200)
-          .expect(expectedPost[1]);
+          .expect(expectedPosts[0]);
       });
 
       // these 2 need to move to their own describe blocks
@@ -78,33 +106,6 @@ describe.only("Posts router", () => {
           .get(`/api/posts/1`)
           .set("Authorization", "Bearer thisisapassword")
           .expect(401, { error: "Unauthorized request" });
-      });
-    });
-  });
-
-  describe("GET /api/posts", () => {
-    context("given there are no posts", () => {
-      const testUser = testUsers[0];
-      it("responds with 404", () => {
-        return supertest(app)
-          .get("/api/posts")
-          .set("Authorization", helpers.makeAuthHeader(testUser))
-          .expect(200, []);
-      });
-    });
-    // passes on its own but not when ran alongside other test
-    context("given there are posts in the db", () => {
-      beforeEach("Seed wp and users", () => {
-        helpers.seedPosts(db, testPosts);
-      });
-
-      const testUser = testUsers[0];
-
-      it("responds with all posts", () => {
-        return supertest(app)
-          .get("/api/posts")
-          .set("Authorization", helpers.makeAuthHeader(testUser))
-          .expect(200, testPosts);
       });
     });
   });

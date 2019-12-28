@@ -7,7 +7,7 @@ describe("Posts router", () => {
   let db;
   let testWp = helpers.makeWp();
   let testUsers = helpers.makeUsers();
-  let testPosts = helpers.makePosts();
+  let { testPosts } = helpers.makePosts();
   let { acksToPost, expectedAcks } = helpers.makeAcks();
 
   before("make knex instance", () => {

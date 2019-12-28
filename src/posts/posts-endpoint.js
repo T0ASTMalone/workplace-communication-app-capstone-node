@@ -14,7 +14,6 @@ postsRouter
     postsService
       .getAllPosts(knex)
       .then(posts => {
-        console.log("these are all the posts we have", posts);
         return res
           .status(200)
           .json(posts.map(posts => postsService.serializePost(posts)));

@@ -57,7 +57,7 @@ makeWp = () => {
 };
 
 makePosts = () => {
-  return [
+  const testPosts = [
     {
       post_id: 1,
       user_id: 1,
@@ -95,6 +95,59 @@ makePosts = () => {
       wp_id: 3
     }
   ];
+
+  const expectedPosts = [
+    {
+      post_id: 1,
+      user_id: 1,
+      title: "Test Post",
+      content: "This is just a test post",
+      priority: 0,
+      type: "idea",
+      wp_id: 1,
+      nickname: "Test nickname 1",
+      img: null,
+      total: "2"
+    },
+    {
+      post_id: 2,
+      user_id: 1,
+      title: "Test Post 2",
+      content: "This is just a second a test post",
+      priority: 0,
+      type: "posts",
+      wp_id: 1,
+      nickname: "Test nickname 1",
+      img: null,
+      total: "2"
+    },
+    {
+      post_id: 3,
+      user_id: 2,
+      title: "Test Post",
+      content: "This is just a test post",
+      priority: 0,
+      type: "posts",
+      wp_id: 2,
+      nickname: "Test nickname 2",
+      img: null,
+      total: "2"
+    },
+    {
+      post_id: 4,
+      user_id: 3,
+      title: "Test Post",
+      content: "This is just a test post",
+      priority: 0,
+      type: "posts",
+      wp_id: 3,
+      nickname: "Test nickname 3",
+      img: null,
+      total: "0"
+    }
+  ];
+
+  return { testPosts, expectedPosts };
 };
 
 makeExpectedPosts = () => {

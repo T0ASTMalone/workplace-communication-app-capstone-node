@@ -2,9 +2,20 @@ const xss = require("xss");
 
 const postsService = {
   getAllPosts(db) {
+    const colId = db.ref("posts.post_id");
+
     return db("posts")
       .innerJoin("users", "posts.user_id", "users.user_id")
-      .select("posts.*", "users.nickname", "users.img");
+      .select(
+        "posts.*",
+        "users.nickname",
+        "users.img",
+        db("seen")
+          .count("*")
+          .where({ post_id: colId })
+          .as("total")
+      )
+      .groupBy("posts.post_id", "users.nickname", "users.img", "total");
   },
 
   createPost(db, post) {
@@ -31,13 +42,6 @@ const postsService = {
       .where({ "posts.type": type });
   },
 
-  // getPostById(db, post_id) {
-  //   return db("posts")
-  //     .innerJoin("users", "posts.user_id", "users.user_id")
-  //     .select("posts.*", "users.nickname", "users.img")
-  //     .where({ "posts.post_id": post_id })
-  //     .first();
-  // },
   getPostById(db, post_id) {
     return db
       .from("posts")
@@ -69,7 +73,6 @@ const postsService = {
   },
 
   serializePost(post) {
-    console.log("serializePost", post);
     return {
       user_id: post.user_id,
       nickname: xss(post.nickname),
@@ -80,7 +83,7 @@ const postsService = {
       wp_id: post.wp_id,
       content: xss(post.content),
       img: post.img,
-      total: post.total
+      total: post.total || "0"
     };
   }
 };
