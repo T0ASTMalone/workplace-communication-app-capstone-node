@@ -68,7 +68,6 @@ postsRouter
     postsService
       .getPostById(knex, id)
       .then(post => {
-        console.log("get post by id ", post);
         if (!post) {
           return res.status(404).json({ error: { message: `Post not found` } });
         }
@@ -78,7 +77,7 @@ postsRouter
       .catch(next);
   })
   .get((req, res, next) => {
-    return res.json(postsService.serializePost(res.post));
+    return res.status(200).json(postsService.serializePost(res.post));
   })
   .delete((req, res, next) => {
     const knex = req.app.get("db");

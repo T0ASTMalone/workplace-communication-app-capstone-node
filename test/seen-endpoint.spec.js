@@ -3,7 +3,7 @@ const app = require("../src/app");
 const helpers = require("./test-helpers");
 const bcrypt = require("bcryptjs");
 
-describe.only("Posts router", () => {
+describe("Posts router", () => {
   let db;
   let testWp = helpers.makeWp();
   let testUsers = helpers.makeUsers();

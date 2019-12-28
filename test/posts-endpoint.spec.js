@@ -3,11 +3,12 @@ const app = require("../src/app");
 const helpers = require("./test-helpers");
 const bcrypt = require("bcryptjs");
 
-describe("Posts router", () => {
+describe.only("Posts router", () => {
   let db;
   let testWp = helpers.makeWp();
   let testUsers = helpers.makeUsers();
   let testPosts = helpers.makePosts();
+  let { acksToPost } = helpers.makeAcks();
 
   before("make knex instance", () => {
     db = knex({
@@ -29,20 +30,22 @@ describe("Posts router", () => {
     helpers.seedUsers(db, testUsers);
   });
 
-  describe("GET /api/posts/:id", () => {
+  describe.only("GET /api/posts/:id", () => {
     context("Given there are posts in the db", () => {
-      beforeEach("seed users and wp and posts", () => {
-        helpers.seedPosts(db, testPosts);
+      beforeEach("seed users and wp and posts", async () => {
+        await helpers.seedPosts(db, testPosts);
+        await helpers.seedAcks(db, acksToPost);
       });
       const testUser = testUsers[0];
 
-      it("responds with 200 and the post", () => {
+      it.only("responds with 200 and the post", () => {
         const expectedPost = helpers.makeExpectedPosts();
 
         return supertest(app)
           .get(`/api/posts/${expectedPost[1].post_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
-          .expect(200, expectedPost[1]);
+          .expect(200)
+          .expect(expectedPost[1]);
       });
 
       // these 2 need to move to their own describe blocks

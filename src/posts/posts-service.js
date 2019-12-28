@@ -19,7 +19,9 @@ const postsService = {
     if (type === "all") {
       return db("posts")
         .innerJoin("users", "posts.user_id", "users.user_id")
+
         .select("posts.*", "users.nickname", "users.img")
+
         .where({ "posts.wp_id": wp_id });
     }
     return db("posts")
@@ -29,11 +31,28 @@ const postsService = {
       .where({ "posts.type": type });
   },
 
+  // getPostById(db, post_id) {
+  //   return db("posts")
+  //     .innerJoin("users", "posts.user_id", "users.user_id")
+  //     .select("posts.*", "users.nickname", "users.img")
+  //     .where({ "posts.post_id": post_id })
+  //     .first();
+  // },
   getPostById(db, post_id) {
-    return db("posts")
+    return db
+      .from("posts")
       .innerJoin("users", "posts.user_id", "users.user_id")
-      .select("posts.*", "users.nickname", "users.img")
+      .select(
+        "posts.*",
+        "users.nickname",
+        "users.img",
+        db("seen")
+          .count("*")
+          .where({ "seen.post_id": post_id })
+          .as("total")
+      )
       .where({ "posts.post_id": post_id })
+      .groupBy("posts.post_id", "users.nickname", "users.img", "total")
       .first();
   },
 
@@ -50,6 +69,7 @@ const postsService = {
   },
 
   serializePost(post) {
+    console.log("serializePost", post);
     return {
       user_id: post.user_id,
       nickname: xss(post.nickname),
@@ -59,7 +79,8 @@ const postsService = {
       priority: post.priority,
       wp_id: post.wp_id,
       content: xss(post.content),
-      img: post.img
+      img: post.img,
+      total: post.total
     };
   }
 };

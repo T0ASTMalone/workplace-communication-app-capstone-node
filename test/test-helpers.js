@@ -108,7 +108,8 @@ makeExpectedPosts = () => {
       type: "posts",
       wp_id: 1,
       nickname: "Test nickname 1",
-      img: null
+      img: null,
+      total: "2"
     },
     {
       post_id: 1,
@@ -119,7 +120,8 @@ makeExpectedPosts = () => {
       type: "idea",
       wp_id: 1,
       nickname: "Test nickname 1",
-      img: null
+      img: null,
+      total: "2"
     }
   ];
 };
