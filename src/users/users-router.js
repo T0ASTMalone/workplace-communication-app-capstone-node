@@ -67,7 +67,6 @@ usersRouter
             .status(404)
             .json({ error: { message: `Invalid WorkPlace Code` } });
         }
-        console.log(type);
         // else get wpId and wpName if WorkPlace
         if (type !== "creator") {
           user.type = "pending";
