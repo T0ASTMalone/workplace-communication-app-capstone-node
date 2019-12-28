@@ -27,19 +27,38 @@ const postsService = {
 
   getWpPosts(db, wp_id, type) {
     // need to query seen table for count of likes
+    const colId = db.ref("posts.post_id");
+
     if (type === "all") {
       return db("posts")
         .innerJoin("users", "posts.user_id", "users.user_id")
 
-        .select("posts.*", "users.nickname", "users.img")
-
-        .where({ "posts.wp_id": wp_id });
+        .select(
+          "posts.*",
+          "users.nickname",
+          "users.img",
+          db("seen")
+            .count("*")
+            .where({ post_id: colId })
+            .as("total")
+        )
+        .where({ "posts.wp_id": wp_id })
+        .groupBy("posts.post_id", "users.nickname", "users.img", "total");
     }
     return db("posts")
       .innerJoin("users", "posts.user_id", "users.user_id")
-      .select("posts.*", "users.nickname", "users.img")
+      .select(
+        "posts.*",
+        "users.nickname",
+        "users.img",
+        db("seen")
+          .count("*")
+          .where({ post_id: colId })
+          .as("total")
+      )
       .where({ "posts.wp_id": wp_id })
-      .where({ "posts.type": type });
+      .where({ "posts.type": type })
+      .groupBy("posts.post_id", "users.nickname", "users.img");
   },
 
   getPostById(db, post_id) {

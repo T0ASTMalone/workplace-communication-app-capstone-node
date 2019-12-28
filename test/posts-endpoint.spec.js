@@ -27,7 +27,7 @@ describe.only("Posts router", () => {
 
   beforeEach("Seed wp and users", async () => {
     await helpers.seedWp(db, testWp);
-    helpers.seedUsers(db, testUsers);
+    await helpers.seedUsers(db, testUsers);
   });
 
   describe("GET /api/posts", () => {
@@ -58,7 +58,7 @@ describe.only("Posts router", () => {
     });
   });
 
-  describe.only("POST /api/posts", () => {
+  describe("POST /api/posts", () => {
     const testUser = testUsers[0];
     context("Given there is missing field", () => {
       const requiredFields = [
@@ -111,12 +111,12 @@ describe.only("Posts router", () => {
   });
 
   describe("GET /api/posts/:id", () => {
+    const testUser = testUsers[0];
     context("Given there are posts in the db", () => {
       beforeEach("seed users and wp and posts", async () => {
         await helpers.seedPosts(db, testPosts);
         await helpers.seedAcks(db, acksToPost);
       });
-      const testUser = testUsers[0];
 
       it("responds with 200 and the post", () => {
         const { expectedPosts } = helpers.makePosts();
@@ -127,17 +127,49 @@ describe.only("Posts router", () => {
           .expect(200)
           .expect(expectedPosts[0]);
       });
+    });
 
-      // these 2 need to move to their own describe blocks
-      // both pass on their own but not when other test are ran at the
-      // same time
+    context("Given there are no posts in the db", () => {
+      it("responds with 404 post not found", () => {
+        return supertest(app)
+          .get(`/api/posts/1`)
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(404, { error: { message: "Post not found" } });
+      });
+    });
+  });
+
+  describe("DELETE /api/posts/:id", () => {
+    const testUser = testUsers[0];
+    context("Given the posts exists", () => {
+      beforeEach("seed posts", async () => {
+        await helpers.seedPosts(db, testPosts);
+      });
       it("Responds with 201 and deletes post", () => {
         return supertest(app)
           .delete(`/api/posts/${testPosts[0].post_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(204);
       });
+    });
 
+    context("Given the posts does not exists", () => {
+      it("Responds with 404 post not found", () => {
+        return supertest(app)
+          .delete(`/api/posts/${testPosts[0].post_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .expect(404, { error: { message: "Post not found" } });
+      });
+    });
+  });
+
+  describe("PATCH /api/posts/:id", () => {
+    beforeEach("seed posts", async () => {
+      await helpers.seedPosts(db, testPosts);
+    });
+
+    const testUser = testUsers[0];
+    context("Given the post exists", () => {
       it("responds with 204 and the post is updated", () => {
         const newPost = {
           ...testPosts[0],
@@ -151,45 +183,34 @@ describe.only("Posts router", () => {
           .expect(204);
       });
     });
-
-    context("Given there are no posts in the db", () => {
-      it("responds with 404", () => {
-        return supertest(app)
-          .get(`/api/posts/1`)
-          .set("Authorization", "Bearer thisisapassword")
-          .expect(401, { error: "Unauthorized request" });
-      });
-    });
   });
 
-  describe("GET /api/posts/wp/:wpId", () => {
+  describe.only("GET /api/posts/wp/:wpId", () => {
+    beforeEach("Seed wp and users", async () => {
+      await helpers.seedPosts(db, testPosts);
+      await helpers.seedAcks(db, acksToPost);
+    });
     context("Get all posts for a wp", () => {
-      beforeEach("Seed wp and users", () => {
-        helpers.seedPosts(db, testPosts);
-      });
-
-      let expectedPosts = helpers.makeExpectedPosts();
-
       const testUser = testUsers[0];
 
+      const { expectedPosts } = helpers.makePosts();
       it("responds with wp posts", () => {
+        const wpPosts = expectedPosts.filter(post => {
+          return post.wp_id === 1;
+        });
         return supertest(app)
           .get(`/api/posts/wp/${1}`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
-          .expect(200, expectedPosts);
+          .expect(200, wpPosts);
       });
     });
 
     context("Get all posts for a wp with type post", () => {
-      beforeEach("Seed wp and users", () => {
-        helpers.seedPosts(db, testPosts);
-      });
-
-      let expectedPosts = helpers.makeExpectedPosts();
+      let { expectedPosts } = helpers.makePosts();
 
       const testUser = testUsers[0];
 
-      let types = ["posts", "idea"];
+      let types = ["idea", "posts"];
 
       types.forEach((type, i) => {
         it("responds with wp posts", () => {
