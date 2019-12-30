@@ -19,6 +19,13 @@ const AuthService = {
       .first();
   },
 
+  getUsrByNickname(db, nickname) {
+    return db("users")
+      .select("*")
+      .where({ nickname })
+      .first();
+  },
+
   parseBasicToken(token) {
     return Buffer.from(token, "base64")
       .toString()

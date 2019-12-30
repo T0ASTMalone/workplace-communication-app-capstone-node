@@ -8,6 +8,7 @@ const xss = require("xss");
 authRouter.post("/login", jsonBodyParser, (req, res, next) => {
   const { nickname, password, type } = req.body;
   const loginUser = { nickname, password, type };
+
   for (const [key, value] of Object.entries(loginUser))
     if (value == null)
       return res.status(400).json({
@@ -20,9 +21,20 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
   )
     .then(dbUser => {
       if (!dbUser) {
-        return res.status(400).json({
-          error: `Incorrect nickname, password, or type`
-        });
+        return AuthService.getUsrByNickname(req.app.get("db"), nickname).then(
+          user => {
+            if (!user) {
+              return res.status(400).json({
+                error: `Incorrect nickname, password, or type`
+              });
+            }
+            if (user.type === "pending") {
+              return res.status(400).json({
+                error: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`
+              });
+            }
+          }
+        );
       }
       return AuthService.comparePasswords(
         loginUser.password,
@@ -30,7 +42,7 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
       ).then(compareMatch => {
         if (!compareMatch) {
           return res.status(400).json({
-            error: `Incorrect email or password`
+            error: `Incorrect nickname, password, or type`
           });
         }
         const sub = dbUser.nickname;
