@@ -105,9 +105,23 @@ postsRouter
     const knex = req.app.get("db");
     const id = req.params.id;
     const type = req.query.type || "all";
-
     postsService
       .getWpPosts(knex, id, type)
+      .then(posts => {
+        return res.json(posts.map(posts => postsService.serializePost(posts)));
+      })
+      .catch(next);
+  });
+
+postsRouter
+  .route("/:id/user")
+  .all(requireAuth)
+  .get((req, res, next) => {
+    const knex = req.app.get("db");
+    const id = req.params.id;
+    const type = req.query.type || "all";
+    postsService
+      .getUserPosts(knex, id, type)
       .then(posts => {
         return res.json(posts.map(posts => postsService.serializePost(posts)));
       })

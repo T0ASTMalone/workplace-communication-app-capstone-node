@@ -42,6 +42,15 @@ const postsService = {
       .where({ "seen.post_id": post_id });
   },
 
+  userAlreadyLiked(db, ack) {
+    const { post_id, user_id } = ack;
+    return db("seen")
+      .select("*")
+      .where({ post_id })
+      .where({ user_id })
+      .first();
+  },
+
   serializeAck(ack) {
     return {
       id: ack.id,

@@ -51,12 +51,19 @@ seenRouter
           error: `Post does not or no longer exists`
         });
       }
-      //create acknowledgement
-      seenService.createAck(knex, ack).then(ack => {
-        return res
-          .status(201)
-          .location(path.posix.join(`/api/seen` + `/${ack.id}`))
-          .json(seenService.serializeAck(ack));
+      //check if acknowledgement exists
+      seenService.userAlreadyLiked(knex, ack).then(ackExists => {
+        if (ackExists !== undefined) {
+          //return acknowledgement id
+          return res.json({ id: ackExists.id });
+        }
+        //create acknowledgement
+        seenService.createAck(knex, ack).then(ack => {
+          return res
+            .status(201)
+            .location(path.posix.join(`/api/seen` + `/${ack.id}`))
+            .json(seenService.serializeAck(ack));
+        });
       });
     });
   });

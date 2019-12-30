@@ -27,9 +27,9 @@ const userService = {
       .first();
   },
 
-  usrExists(db, username, wp_id) {
+  usrExists(db, nickname, wp_id) {
     return db("users")
-      .where({ username })
+      .where({ nickname })
       .where({ wp_id })
       .first()
       .then(user => !!user);

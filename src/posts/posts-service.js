@@ -15,7 +15,8 @@ const postsService = {
           .where({ post_id: colId })
           .as("total")
       )
-      .groupBy("posts.post_id", "users.nickname", "users.img", "total");
+      .groupBy("posts.post_id", "users.nickname", "users.img", "total")
+      .orderBy("posts.date_added", "desc");
   },
 
   createPost(db, post) {
@@ -42,7 +43,8 @@ const postsService = {
             .as("total")
         )
         .where({ "posts.wp_id": wp_id })
-        .groupBy("posts.post_id", "users.nickname", "users.img", "total");
+        .groupBy("posts.post_id", "users.nickname", "users.img", "total")
+        .orderBy("posts.date_added", "desc");
     }
     return db("posts")
       .innerJoin("users", "posts.user_id", "users.user_id")
@@ -57,7 +59,45 @@ const postsService = {
       )
       .where({ "posts.wp_id": wp_id })
       .where({ "posts.type": type })
-      .groupBy("posts.post_id", "users.nickname", "users.img");
+      .groupBy("posts.post_id", "users.nickname", "users.img")
+      .orderBy("posts.date_added", "desc");
+  },
+
+  getUserPosts(db, user_id, type) {
+    // need to query seen table for count of likes
+    const colId = db.ref("posts.post_id");
+
+    if (type === "all") {
+      return db("posts")
+        .innerJoin("users", "posts.user_id", "users.user_id")
+        .select(
+          "posts.*",
+          "users.nickname",
+          "users.img",
+          db("seen")
+            .count("*")
+            .where({ post_id: colId })
+            .as("total")
+        )
+        .where({ "posts.wp_id": user_id })
+        .groupBy("posts.post_id", "users.nickname", "users.img", "total")
+        .orderBy("posts.date_added", "desc");
+    }
+    return db("posts")
+      .innerJoin("users", "posts.user_id", "users.user_id")
+      .select(
+        "posts.*",
+        "users.nickname",
+        "users.img",
+        db("seen")
+          .count("*")
+          .where({ post_id: colId })
+          .as("total")
+      )
+      .where({ "posts.user_id": user_id })
+      .where({ "posts.type": type })
+      .groupBy("posts.post_id", "users.nickname", "users.img")
+      .orderBy("posts.date_added", "desc");
   },
 
   getPostById(db, post_id) {

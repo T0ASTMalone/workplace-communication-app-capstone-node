@@ -77,7 +77,7 @@ usersRouter
 
         // validate that users with that username does not already exists
         // in the WorkPlace
-        usersService.usrExists(knex, username, user.wp_id).then(existing => {
+        usersService.usrExists(knex, nickname, user.wp_id).then(existing => {
           // if username already exists in WorkPlace
           // return user already exists
           if (existing) {
@@ -147,7 +147,7 @@ usersRouter
     usersService
       .updateUser(knex, id, newUserInfo)
       .then(() => {
-        res.status(204).end();
+        res.status(204).json();
       })
       .catch(next);
   });
