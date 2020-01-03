@@ -24,7 +24,13 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
       if (!dbUser) {
         return AuthService.getUsrByNickname(req.app.get("db"), nickname).then(
           user => {
-            if (user.type === "pending") {
+            if (!user) {
+              return res.status(400).json({
+                error: {
+                  message: `User not found`
+                }
+              });
+            } else if (user.type === "pending") {
               return res.status(400).json({
                 error: {
                   message: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`
