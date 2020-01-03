@@ -82,7 +82,7 @@ describe("Wp endpoint", () => {
       });
     });
 
-    context("Given an xss attack meal", () => {
+    context("Given an xss attack wp", () => {
       const { maliciousWp, expectedWp } = helpers.makeMaliciousWp();
 
       beforeEach("seed malicious meal", () => {

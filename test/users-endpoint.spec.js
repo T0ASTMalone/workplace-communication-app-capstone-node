@@ -65,10 +65,10 @@ describe("users router", () => {
       requiredFields.forEach(field => {
         const registerAttemptBody = {
           username: "testuser",
+          nickname: "Test nickname 999",
           password: "Thisis@testpassword!",
           type: "pending",
           code: 1234,
-          nickname: null,
           img: null
         };
         it(`responds with 400 required error when '${field}' is missing`, () => {
@@ -78,7 +78,7 @@ describe("users router", () => {
               .post("/api/users")
               .send(registerAttemptBody)
               .expect(400, {
-                error: `Missing '${field}' in request body`
+                error: { message: `Missing '${field}' in request body` }
               });
           }
         });
@@ -87,10 +87,10 @@ describe("users router", () => {
       it("responds 400 password must be longers than 8 characters when empty password", () => {
         const shortPass = {
           username: "Test user",
+          nickname: "Test nickname 999",
           password: "112",
           type: "",
           code: 1234,
-          nickname: null,
           img: null
         };
 
@@ -105,10 +105,10 @@ describe("users router", () => {
       it(`responds 400 'Password be less than 72 characters' when long password`, () => {
         const userLongPassword = {
           username: "testusername",
+          nickname: "Test nickname 999",
           password: "*".repeat(73),
           type: "",
           code: 1234,
-          nickname: null,
           img: null
         };
         return supertest(app)
@@ -122,10 +122,10 @@ describe("users router", () => {
       it(`responds 400 error when password starts with spaces`, () => {
         const userPasswordStartsSpaces = {
           username: "Test user",
+          nickname: "Test nickname 999",
           password: " 1Aa!2Bb@",
           type: "",
           code: 1234,
-          nickname: null,
           img: null
         };
         return supertest(app)
@@ -141,10 +141,10 @@ describe("users router", () => {
       it(`responds 400 error when password ends with spaces`, () => {
         const userPasswordEndsSpaces = {
           username: "testemail@testmail",
+          nickname: "Test nickname 999",
           password: "1Aa!2Bb@ ",
           type: "",
           code: 1234,
-          nickname: null,
           img: null
         };
         return supertest(app)
@@ -160,10 +160,10 @@ describe("users router", () => {
       it(`responds 400 error when password isn't complex enough`, () => {
         const userPasswordNotComplex = {
           username: "testemail@testmail",
+          nickname: "Test nickname 999",
           password: "11AAaabb",
           type: "",
           code: 1234,
-          nickname: null,
           img: null
         };
         return supertest(app)
@@ -181,16 +181,16 @@ describe("users router", () => {
         await helpers.seedUsers(db, testUsers);
         const duplicateUser = {
           username: testUser.username,
+          nickname: testUser.nickname,
           password: "TestPassw0rd!",
           type: "",
           code: 1234,
-          nickname: null,
           img: null
         };
         return supertest(app)
           .post("/api/users")
           .send(duplicateUser)
-          .expect(400, { error: { message: `Username already taken` } });
+          .expect(400, { error: { message: `Nickname already taken` } });
       });
     });
 
@@ -202,7 +202,7 @@ describe("users router", () => {
           password: "TestPassw0rd!",
           type: "",
           code: 1234,
-          nickname: null,
+          nickname: "test nickname 999",
           img: null
         };
 

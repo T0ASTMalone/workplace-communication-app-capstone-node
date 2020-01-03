@@ -33,9 +33,9 @@ postsRouter
     }
     // check for missing fields
     for (const [key, value] of Object.entries(posts)) {
-      if (value == null) {
+      if (!value && key !== "priority") {
         return res.status(400).json({
-          error: `Missing '${key}' in request body`
+          error: { message: `Missing '${key}' in request body` }
         });
       }
     }

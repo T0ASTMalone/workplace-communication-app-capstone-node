@@ -107,6 +107,7 @@ makePosts = () => {
       wp_id: 1,
       nickname: "Test nickname 1",
       img: null,
+      username: "Test user 1",
       total: "2"
     },
     {
@@ -119,6 +120,7 @@ makePosts = () => {
       wp_id: 1,
       nickname: "Test nickname 1",
       img: null,
+      username: "Test user 1",
       total: "2"
     },
     {
@@ -131,6 +133,7 @@ makePosts = () => {
       wp_id: 2,
       nickname: "Test nickname 2",
       img: null,
+      username: "Test user 2",
       total: "2"
     },
     {
@@ -143,6 +146,7 @@ makePosts = () => {
       wp_id: 3,
       nickname: "Test nickname 3",
       img: null,
+      username: "Test user 3",
       total: "0"
     }
   ];
@@ -296,7 +300,7 @@ seedAcks = (db, acks) => {
 
 makeAuthHeader = (user, secret = process.env.JWT_SECRET) => {
   const token = jwt.sign({ user_id: user.user_id }, secret, {
-    subject: user.username,
+    subject: user.nickname,
     algorithm: "HS256"
   });
   return `Bearer ${token}`;

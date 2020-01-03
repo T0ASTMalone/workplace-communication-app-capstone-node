@@ -58,6 +58,7 @@ wpRouter
     wpService
       .getById(knex, id)
       .then(wp => {
+        console.log(wp);
         if (!wp) {
           return res
             .status(404)

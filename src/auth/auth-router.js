@@ -8,7 +8,6 @@ const xss = require("xss");
 authRouter.post("/login", jsonBodyParser, (req, res, next) => {
   const { nickname, password, type } = req.body;
   const loginUser = { nickname, password, type };
-  console.log(type);
 
   for (const [key, value] of Object.entries(loginUser))
     if (value == null)

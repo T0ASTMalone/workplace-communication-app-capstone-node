@@ -3,7 +3,7 @@ const app = require("../src/app");
 const helpers = require("./test-helpers");
 const bcrypt = require("bcryptjs");
 
-describe.only("Posts router", () => {
+describe("Posts router", () => {
   let db;
   let testWp = helpers.makeWp();
   let testUsers = helpers.makeUsers();
@@ -61,21 +61,13 @@ describe.only("Posts router", () => {
   describe("POST /api/posts", () => {
     const testUser = testUsers[0];
     context("Given there is missing field", () => {
-      const requiredFields = [
-        "user_id",
-        "title",
-        "type",
-        "priority",
-        "wp_id",
-        "content"
-      ];
+      const requiredFields = ["user_id", "title", "type", "wp_id", "content"];
 
       requiredFields.forEach(field => {
         const testPost = {
           user_id: 1,
           title: "This is a test title",
           type: "posts",
-          priority: 0,
           wp_id: 1,
           content: "this is a test post"
         };
@@ -85,7 +77,9 @@ describe.only("Posts router", () => {
             .post("/api/posts")
             .set("Authorization", helpers.makeAuthHeader(testUser))
             .send(testPost)
-            .expect(400, { error: `Missing '${field}' in request body` });
+            .expect(400, {
+              error: { message: `Missing '${field}' in request body` }
+            });
         });
       });
     });
@@ -185,11 +179,12 @@ describe.only("Posts router", () => {
     });
   });
 
-  describe.only("GET /api/posts/wp/:wpId", () => {
+  describe("GET /api/posts/:wpId/wp", () => {
     beforeEach("Seed wp and users", async () => {
       await helpers.seedPosts(db, testPosts);
       await helpers.seedAcks(db, acksToPost);
     });
+
     context("Get all posts for a wp", () => {
       const testUser = testUsers[0];
 
@@ -199,7 +194,7 @@ describe.only("Posts router", () => {
           return post.wp_id === 1;
         });
         return supertest(app)
-          .get(`/api/posts/wp/${1}`)
+          .get(`/api/posts/${1}/wp`)
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(200, wpPosts);
       });
@@ -215,7 +210,7 @@ describe.only("Posts router", () => {
       types.forEach((type, i) => {
         it("responds with wp posts", () => {
           return supertest(app)
-            .get(`/api/posts/wp/${1}?type=${type}`)
+            .get(`/api/posts/${1}?type=${type}/wp`)
             .set("Authorization", helpers.makeAuthHeader(testUser))
             .expect(200, [expectedPosts[i]]);
         });

@@ -44,7 +44,7 @@ usersRouter
       if (value == null) {
         if (key !== "img") {
           return res.status(400).json({
-            error: `Missing '${key}' in request body`
+            error: { message: `Missing '${key}' in request body` }
           });
         }
       }
@@ -83,7 +83,7 @@ usersRouter
           if (existing) {
             return res
               .status(400)
-              .json({ error: { message: "Username already taken" } });
+              .json({ error: { message: "Nickname already taken" } });
           }
           // hash the users password
           return usersService.hashPass(password).then(hashedPass => {
