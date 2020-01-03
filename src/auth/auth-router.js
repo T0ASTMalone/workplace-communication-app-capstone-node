@@ -8,6 +8,7 @@ const xss = require("xss");
 authRouter.post("/login", jsonBodyParser, (req, res, next) => {
   const { nickname, password, type } = req.body;
   const loginUser = { nickname, password, type };
+  console.log(type);
 
   for (const [key, value] of Object.entries(loginUser))
     if (value == null)
@@ -46,16 +47,7 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
         }
         const sub = dbUser.nickname;
         const payload = { user_id: dbUser.user_id };
-        const { wp_name, wp_code } = dbUser;
-
-        if (loginUser.type === "creator") {
-          return res.send({
-            authToken: AuthService.createJwt(sub, payload),
-            wp_name: xss(wp_name),
-            wp_code: xss(wp_code),
-            payload
-          });
-        }
+        const { wp_name } = dbUser;
 
         return res.send({
           authToken: AuthService.createJwt(sub, payload),

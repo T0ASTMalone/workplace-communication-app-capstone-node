@@ -22,8 +22,9 @@ const userService = {
 
   getUsrById(db, id) {
     return db("users")
-      .select("*")
-      .where("user_id", id)
+      .innerJoin("workplaces", "users.wp_id", "workplaces.wp_id")
+      .select("users.*", "workplaces.wp_name", "workplaces.wp_code")
+      .where("users.user_id", id)
       .first();
   },
 
@@ -82,6 +83,17 @@ const userService = {
   },
 
   serializeUser(user) {
+    if (user.type === "creator") {
+      return {
+        user_id: user.user_id,
+        username: xss(user.username),
+        wp_id: user.wp_id,
+        type: user.type,
+        code: user.wp_code,
+        nickname: xss(user.nickname),
+        img: user.img
+      };
+    }
     return {
       user_id: user.user_id,
       username: xss(user.username),
