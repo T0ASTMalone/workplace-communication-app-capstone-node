@@ -90,7 +90,6 @@ usersRouter
             user.password = hashedPass;
             // create user
             return usersService.createUsr(knex, user).then(user => {
-              console.log(user);
               // respond with new user
               res
                 .status(201)

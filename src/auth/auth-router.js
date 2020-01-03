@@ -13,7 +13,7 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
   for (const [key, value] of Object.entries(loginUser))
     if (value == null)
       return res.status(400).json({
-        error: `Missing '${key}' in request body`
+        error: { message: `Missing '${key}' in request body` }
       });
   AuthService.getUserWithNickname(
     req.app.get("db"),
@@ -26,11 +26,13 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
           user => {
             if (user.type === "pending") {
               return res.status(400).json({
-                error: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`
+                error: {
+                  message: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`
+                }
               });
             }
             return res.status(400).json({
-              error: `Incorrect nickname, password, or type`
+              error: { message: `Incorrect nickname, password, or type` }
             });
           }
         );
@@ -42,7 +44,7 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
       ).then(compareMatch => {
         if (!compareMatch) {
           return res.status(400).json({
-            error: `Incorrect nickname, password, or type`
+            error: { message: `Incorrect nickname, password, or type` }
           });
         }
         const sub = dbUser.nickname;
