@@ -6,7 +6,7 @@ const AuthService = {
   getUserWithNickname(db, nickname, type) {
     return db("users")
       .innerJoin("workplaces", "users.wp_id", "workplaces.wp_id")
-      .select("users.*", "workplaces.wp_name")
+      .select("users.*", "workplaces.wp_name", "workplaces.wp_code")
       .where({ "users.nickname": nickname })
       .where({ "users.type": type })
       .first();

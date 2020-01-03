@@ -23,19 +23,18 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
       if (!dbUser) {
         return AuthService.getUsrByNickname(req.app.get("db"), nickname).then(
           user => {
-            if (!user) {
-              return res.status(400).json({
-                error: `Incorrect nickname, password, or type`
-              });
-            }
             if (user.type === "pending") {
               return res.status(400).json({
                 error: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`
               });
             }
+            return res.status(400).json({
+              error: `Incorrect nickname, password, or type`
+            });
           }
         );
       }
+
       return AuthService.comparePasswords(
         loginUser.password,
         dbUser.password
@@ -47,8 +46,18 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
         }
         const sub = dbUser.nickname;
         const payload = { user_id: dbUser.user_id };
-        const { wp_name } = dbUser;
-        res.send({
+        const { wp_name, wp_code } = dbUser;
+
+        if (loginUser.type === "creator") {
+          return res.send({
+            authToken: AuthService.createJwt(sub, payload),
+            wp_name: xss(wp_name),
+            wp_code: xss(wp_code),
+            payload
+          });
+        }
+
+        return res.send({
           authToken: AuthService.createJwt(sub, payload),
           wp_name: xss(wp_name),
           payload
