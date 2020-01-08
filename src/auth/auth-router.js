@@ -6,8 +6,8 @@ const jsonBodyParser = express.json();
 const xss = require("xss");
 
 authRouter.post("/login", jsonBodyParser, (req, res, next) => {
-  const { nickname, password, type } = req.body;
-  const loginUser = { nickname, password, type };
+  const { nickname, password } = req.body;
+  const loginUser = { nickname, password };
 
   for (const [key, value] of Object.entries(loginUser))
     if (value == null)
@@ -16,31 +16,22 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
       });
   AuthService.getUserWithNickname(
     req.app.get("db"),
-    loginUser.nickname,
-    loginUser.type
+    loginUser.nickname
+    // loginUser.type
   )
     .then(dbUser => {
       if (!dbUser) {
-        return AuthService.getUsrByNickname(req.app.get("db"), nickname).then(
-          user => {
-            if (!user) {
-              return res.status(400).json({
-                error: {
-                  message: `User not found`
-                }
-              });
-            } else if (user.type === "pending") {
-              return res.status(400).json({
-                error: {
-                  message: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`
-                }
-              });
-            }
-            return res.status(400).json({
-              error: { message: `Incorrect nickname, password, or type` }
-            });
+        return res.status(400).json({
+          error: {
+            message: `User not found`
           }
-        );
+        });
+      } else if (dbUser.type === "pending") {
+        return res.status(400).json({
+          error: {
+            message: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`
+          }
+        });
       }
 
       return AuthService.comparePasswords(

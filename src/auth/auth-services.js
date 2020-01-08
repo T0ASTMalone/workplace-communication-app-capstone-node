@@ -3,19 +3,11 @@ const jwt = require("jsonwebtoken");
 const config = require("../config");
 
 const AuthService = {
-  getUserWithNickname(db, nickname, type) {
+  getUserWithNickname(db, nickname) {
     return db("users")
       .innerJoin("workplaces", "users.wp_id", "workplaces.wp_id")
       .select("users.*", "workplaces.wp_name", "workplaces.wp_code")
       .where({ "users.nickname": nickname })
-      .where({ "users.type": type })
-      .first();
-  },
-
-  getUserWithJustNickname(db, nickname) {
-    return db("users")
-      .select("*")
-      .where({ nickname })
       .first();
   },
 
