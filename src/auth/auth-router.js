@@ -40,7 +40,7 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
       ).then(compareMatch => {
         if (!compareMatch) {
           return res.status(400).json({
-            error: { message: `Incorrect nickname, password, or type` }
+            error: { message: `Incorrect nickname, password` }
           });
         }
         const sub = dbUser.nickname;
