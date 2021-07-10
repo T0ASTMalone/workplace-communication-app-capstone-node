@@ -9,14 +9,11 @@ const wpService = {
     return db("workplaces")
       .insert(wp)
       .returning("*")
-      .then(rows => rows[0]);
+      .then((rows) => rows[0]);
   },
 
   getById(db, wp_id) {
-    return db("workplaces")
-      .select("*")
-      .where({ wp_id })
-      .first();
+    return db("workplaces").select("*").where({ wp_id }).first();
   },
 
   getWpUsers(db, wp_id) {
@@ -29,9 +26,7 @@ const wpService = {
   },
 
   deleteWp(db, wp_id) {
-    return db("workplaces")
-      .where({ wp_id })
-      .delete();
+    return db("workplaces").where({ wp_id }).delete();
   },
 
   serializeWp(wp, created) {
@@ -40,15 +35,15 @@ const wpService = {
         wp_id: wp.wp_id,
         wp_name: xss(wp.wp_name),
         type: wp.type,
-        wp_code: wp.wp_code
+        wp_code: wp.wp_code,
       };
     }
     return {
       wp_id: wp.wp_id,
       wp_name: xss(wp.wp_name),
-      type: wp.type
+      type: wp.type,
     };
-  }
+  },
 };
 
 module.exports = wpService;

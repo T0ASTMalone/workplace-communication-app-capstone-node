@@ -8,39 +8,39 @@ const xss = require("xss");
 authRouter.post("/login", jsonBodyParser, (req, res, next) => {
   const { nickname, password } = req.body;
   const loginUser = { nickname, password };
-
+  console.log(loginUser);
   for (const [key, value] of Object.entries(loginUser))
     if (value == null)
       return res.status(400).json({
-        error: { message: `Missing '${key}' in request body` }
+        error: { message: `Missing '${key}' in request body` },
       });
   AuthService.getUserWithNickname(
     req.app.get("db"),
     loginUser.nickname
     // loginUser.type
   )
-    .then(dbUser => {
+    .then((dbUser) => {
       if (!dbUser) {
         return res.status(400).json({
           error: {
-            message: `User not found`
-          }
+            message: `User not found`,
+          },
         });
       } else if (dbUser.type === "pending") {
         return res.status(400).json({
           error: {
-            message: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`
-          }
+            message: `Sorry, the creator of the WorkPlace must accept new members into the WorkPlace`,
+          },
         });
       }
 
       return AuthService.comparePasswords(
         loginUser.password,
         dbUser.password
-      ).then(compareMatch => {
+      ).then((compareMatch) => {
         if (!compareMatch) {
           return res.status(400).json({
-            error: { message: `Incorrect username, password` }
+            error: { message: `Incorrect username, password` },
           });
         }
         const sub = dbUser.nickname;
@@ -50,7 +50,7 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
         return res.send({
           authToken: AuthService.createJwt(sub, payload),
           wp_name: xss(wp_name),
-          payload
+          payload,
         });
       });
     })
@@ -62,7 +62,7 @@ authRouter.post("/refresh", requireAuth, (req, res, next) => {
   const payload = { user_id: req.user.user_id };
   res.send({
     authToken: AuthService.createJwt(sub, payload),
-    payload
+    payload,
   });
 });
 

@@ -14,7 +14,7 @@ wpRouter
     const knex = req.app.get("db");
     wpService
       .getWorkplaces(knex)
-      .then(workplaces => {
+      .then((workplaces) => {
         if (workplaces.length < 1) {
           return res
             .status(404)
@@ -22,7 +22,7 @@ wpRouter
         }
         return res
           .status(200)
-          .json(workplaces.map(wp => wpService.serializeWp(wp)));
+          .json(workplaces.map((wp) => wpService.serializeWp(wp)));
       })
       .catch(next);
   })
@@ -33,14 +33,14 @@ wpRouter
     for (const [key, value] of Object.entries(wp)) {
       if (value == null) {
         return res.status(400).json({
-          error: `Missing '${key}' in request body`
+          error: `Missing '${key}' in request body`,
         });
       }
     }
     wp.wp_code = shortid.generate();
     wpService
       .createWp(knex, wp)
-      .then(newWp => {
+      .then((newWp) => {
         return res
           .status(201)
           .location(path.posix.join(req.originalUrl + `/${newWp.wp_id}`))
@@ -57,7 +57,7 @@ wpRouter
     let id = req.params.id;
     wpService
       .getById(knex, id)
-      .then(wp => {
+      .then((wp) => {
         if (!wp) {
           return res
             .status(404)
@@ -79,7 +79,7 @@ wpRouter
     let id = req.params.id;
     wpService
       .getWpUsers(knex, id)
-      .then(wp => {
+      .then((wp) => {
         if (wp > 1) {
           return res
             .status(400)
