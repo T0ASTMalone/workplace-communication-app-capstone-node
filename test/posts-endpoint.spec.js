@@ -13,15 +13,19 @@ describe("Posts router", () => {
   before("make knex instance", () => {
     db = knex({
       client: "pg",
-      connection: process.env.TEST_DATABASE_URL
+      connection: process.env.TEST_DATABASE_URL,
+      pool: { min: 0, max: 100 },
+      connectTimeout: 90000,
+      debug: true,
     });
-
     app.set("db", db);
   });
 
   after("disconnect from db", () => db.destroy());
 
-  before("cleanup", () => helpers.cleanTables(db));
+  before("cleanup", async () => {
+    await helpers.cleanTables(db);
+  });
 
   afterEach("cleanup", () => helpers.cleanTables(db));
 
@@ -63,13 +67,13 @@ describe("Posts router", () => {
     context("Given there is missing field", () => {
       const requiredFields = ["user_id", "title", "type", "wp_id", "content"];
 
-      requiredFields.forEach(field => {
+      requiredFields.forEach((field) => {
         const testPost = {
           user_id: 1,
           title: "This is a test title",
           type: "posts",
           wp_id: 1,
-          content: "this is a test post"
+          content: "this is a test post",
         };
         delete testPost[field];
         it("responds with 400 Missing field in request body", () => {
@@ -78,7 +82,7 @@ describe("Posts router", () => {
             .set("Authorization", helpers.makeAuthHeader(testUser))
             .send(testPost)
             .expect(400, {
-              error: { message: `Missing '${field}' in request body` }
+              error: { message: `Missing '${field}' in request body` },
             });
         });
       });
@@ -91,7 +95,7 @@ describe("Posts router", () => {
         type: "posts",
         priority: 0,
         wp_id: 1,
-        content: "this is a test post"
+        content: "this is a test post",
       };
 
       it("responds with 201 and the new post", () => {
@@ -167,7 +171,7 @@ describe("Posts router", () => {
       it("responds with 204 and the post is updated", () => {
         const newPost = {
           ...testPosts[0],
-          content: "This is an updated post"
+          content: "This is an updated post",
         };
 
         return supertest(app)
@@ -190,7 +194,7 @@ describe("Posts router", () => {
 
       const { expectedPosts } = helpers.makePosts();
       it("responds with wp posts", () => {
-        const wpPosts = expectedPosts.filter(post => {
+        const wpPosts = expectedPosts.filter((post) => {
           return post.wp_id === 1;
         });
         return supertest(app)

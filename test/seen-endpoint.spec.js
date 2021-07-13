@@ -13,7 +13,7 @@ describe("Posts router", () => {
   before("make knex instance", () => {
     db = knex({
       client: "pg",
-      connection: process.env.TEST_DATABASE_URL
+      connection: process.env.TEST_DATABASE_URL,
     });
 
     app.set("db", db);
@@ -61,10 +61,10 @@ describe("Posts router", () => {
     context("Given there is missing data in post request", () => {
       const fields = ["user_id", "post_id"];
 
-      fields.forEach(field => {
+      fields.forEach((field) => {
         const ack = {
           user_id: 1,
-          post_id: 3
+          post_id: 3,
         };
 
         it(`responds with 'Missing acknowledgement in request body'`, () => {
@@ -74,7 +74,7 @@ describe("Posts router", () => {
             .set("Authorization", helpers.makeAuthHeader(testUser))
             .send(ack)
             .expect(400, {
-              error: `Missing '${field}' in request body`
+              error: `Missing '${field}' in request body`,
             });
         });
       });
@@ -83,7 +83,7 @@ describe("Posts router", () => {
     context("Given the post does not or no longer exists", () => {
       const ack = {
         user_id: 1,
-        post_id: 200
+        post_id: 200,
       };
 
       it(`responds with 400 'post does not or no longer exists'`, () => {
@@ -92,7 +92,7 @@ describe("Posts router", () => {
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .send(ack)
           .expect(400, {
-            error: `Post does not or no longer exists`
+            error: `Post does not or no longer exists`,
           });
       });
     });
@@ -101,7 +101,7 @@ describe("Posts router", () => {
       const testUser = testUsers[0];
       const ack = {
         user_id: testUser.user_id,
-        post_id: 4
+        post_id: 4,
       };
       it("responds with 201 and the new acknowledgement", () => {
         return supertest(app)
@@ -109,7 +109,7 @@ describe("Posts router", () => {
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .send(ack)
           .expect(201)
-          .expect(res => {
+          .expect((res) => {
             expect(res.body).to.have.property("id");
             expect(res.body.user_id).to.eql(testUser.user_id);
             expect(res.body.post_id).to.eql(ack.post_id);
@@ -135,19 +135,19 @@ describe("Posts router", () => {
         await helpers.seedAcks(db, acksToPost);
       });
 
-      const deletedAck = expectedAcks.filter(ack => ack.id !== 1);
+      const deletedAck = expectedAcks.filter((ack) => ack.id !== 1);
 
       it("responds with 204", () => {
         return supertest(app)
           .delete("/api/seen/1")
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(204)
-          .expect(res =>
+          .expect((res) =>
             db
               .from("seen")
               .innerJoin("users", "seen.user_id", "users.user_id")
               .select("seen.*", "users.nickname")
-              .then(acks => {
+              .then((acks) => {
                 expect(acks).to.eql(deletedAck);
               })
           );
@@ -164,7 +164,7 @@ describe("Posts router", () => {
           .get("/api/seen/post/200")
           .set("Authorization", helpers.makeAuthHeader(testUser))
           .expect(404, {
-            error: { message: "Post does not or no longer exists" }
+            error: { message: "Post does not or no longer exists" },
           });
       });
     });
@@ -175,7 +175,7 @@ describe("Posts router", () => {
       });
 
       const postId = 1;
-      const postAcks = expectedAcks.filter(ack => ack.post_id === postId);
+      const postAcks = expectedAcks.filter((ack) => ack.post_id === postId);
 
       it("responds with 200 and the post acks", () => {
         return supertest(app)
