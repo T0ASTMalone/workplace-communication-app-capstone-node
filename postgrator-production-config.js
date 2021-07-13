@@ -1,10 +1,10 @@
-require('dotenv').config();
+require("dotenv").config();
 
 module.exports = {
-  migrationDirectory: 'migrations',
-  driver: 'pg',
+  migrationDirectory: "migrations",
+  driver: "pg",
   connectionString:
-    process.env.NODE_ENV === 'test'
+    process.env.NODE_ENV === "development"
       ? process.env.TEST_DATABASE_URL
       : process.env.DATABASE_URL,
   ssl: !!process.env.SSL,
@@ -12,5 +12,5 @@ module.exports = {
   port: process.env.PROD_MIGRATION_DB_PORT,
   database: process.env.PROD_MIGRATION_DB_NAME,
   username: process.env.PROD_MIGRATION_DB_USER,
-  password: process.env.PROD_MIGRATION_DB_PASS
+  password: process.env.PROD_MIGRATION_DB_PASS,
 };
